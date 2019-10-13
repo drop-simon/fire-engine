@@ -1,18 +1,20 @@
 {
   "name": "fire-engine",
+  "author": "@simonsteer",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
+  "scripts": {
+    "prepublish": "tsc"
+  },
   "dependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/preset-typescript": "^7.6.0",
-    "@types/lodash": "^4.14.144",
-    "@types/node-dijkstra": "^2.5.0",
     "lodash": "^4.17.15",
     "node-dijkstra": "^2.5.0",
-    "source-map-loader": "^0.2.4",
     "typescript": "^3.6.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.144",
+    "@types/node-dijkstra": "^2.5.0"
   }
 }
