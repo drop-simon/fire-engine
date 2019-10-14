@@ -1,52 +1,46 @@
-import merge from "lodash/merge";
 import {
-  UnitConfigType,
   UnitType,
   AnyUnitClassConfigType,
-  AnyUnitType,
-  CombatCategoryType
+  StatGrowthRateListType
 } from "../types";
-import UnitCreationService from "./UnitCreationService";
 import EventService from "./EventService";
+import { Units } from "../constants";
+import UnitManagementService from "./UnitManagementService";
 
 type GameEventHandlers = {
-  battleStart: (unit: AnyUnitType) => void;
-  battleEnd: (args: { success: boolean }) => void;
+  unitLevelUp: (args: {
+    unit: UnitType;
+    prevStats: StatGrowthRateListType;
+    nextStats: StatGrowthRateListType;
+  }) => any;
 };
 
 export default class GameManagementService extends EventService<
   GameEventHandlers
 > {
   unitClasses = new Map<string, AnyUnitClassConfigType>();
-  units = new Map<string, AnyUnitType>();
+  units = new Map<string, UnitType>();
   chapters = new Map();
 
-  registerUnitClass<U extends AnyUnitClassConfigType>(unitClass: U) {
-    this.unitClasses.set(unitClass.name, unitClass);
-    return this;
+  testing() {
+    const calypso = this.registerUnit(Units.Calypso)
+      .getUnit("Calypso")
+      .levelUp();
+    console.log(calypso.unit);
   }
 
-  registerUnit<C extends CombatCategoryType>(unitConfig: UnitConfigType<C>) {
-    const unit = new UnitCreationService<C>(unitConfig).process();
-    this.units.set(unitConfig.name, unit);
-    return this;
-  }
-
-  updateUnit(unitName: string, updates: Partial<UnitType>) {
-    const unit = this.getUnit(unitName);
-    if (!unit) {
-      return this;
-    }
-    const updatedUnit = merge(unit, updates);
-    this.units.set(unitName, updatedUnit);
+  registerUnit(unit: UnitType) {
+    this.units.set(unit.name, unit);
     return this;
   }
 
   getUnit(unitName: string) {
-    return this.units.get(unitName);
-  }
-
-  getUnitClass(unitClassName: string) {
-    return this.unitClasses.get(unitClassName);
+    const unit = this.units.get(unitName);
+    if (!unit) {
+      return null;
+    }
+    return new UnitManagementService({ unit, gameManager: this });
   }
 }
+
+new GameManagementService().testing();

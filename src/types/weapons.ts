@@ -26,6 +26,7 @@ export type WeaponEffectType = (
 
 export interface WeaponConfigType<C extends CombatCategoryType> {
   category: C;
+  name: string;
   type: C extends "Magic"
     ? MagicWeaponType
     : C extends "Physical"

@@ -1,24 +1,40 @@
-import {
-  WeaponType,
-  CombatCategoryType,
-  UnitType,
-  UnitConfigType
-} from "../types";
+import { WeaponType, CombatCategoryType, UnitType } from "../types";
 import { increaseStats } from "./utils";
+import GameManagementService from "./GameManagementService";
+
+interface UnitManagementServiceConfigType {
+  unit: UnitType;
+  gameManager: GameManagementService;
+}
 
 export default class UnitManagementService {
   unit: UnitType;
+  gameManager: GameManagementService;
 
-  constructor(unit: UnitType) {
+  constructor({ unit, gameManager }: UnitManagementServiceConfigType) {
     this.unit = unit;
+    this.gameManager = gameManager;
   }
 
   levelUp() {
+    if (this.unit.level === 20) {
+      return this;
+    }
+
+    const currentStats = this.unit.stats;
     const nextStats = increaseStats({
       growthRates: this.unit.growthRates,
       currentStats: this.unit.stats
     });
+
     this.unit.stats = nextStats;
+    this.gameManager.emit("unitLevelUp", {
+      unit: this.unit,
+      prevStats: currentStats,
+      nextStats
+    });
+
+    return this;
   }
 
   get equippedWeapon(): WeaponType | null {

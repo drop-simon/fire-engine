@@ -8,7 +8,7 @@ export const Calypso = new UnitCreationService<"Physical">({
   birthMonth: "September",
   bloodType: "A",
   sex: "F",
-  items: [Weapons["Silver Axe"]],
+  items: [Weapons.SilverAxe],
   weaponLevels: [{ weapon: "Lances" as const, level: "A" as const }],
   supports: {},
   base: Lord
@@ -20,12 +20,12 @@ export const Artemis = new UnitCreationService<"Physical">({
   birthMonth: "June",
   bloodType: "AB",
   sex: "M",
-  items: [Weapons["Silver Axe"]],
+  items: [Weapons.SilverAxe],
   weaponLevels: [{ weapon: "Axes", level: "A" }],
   supports: {},
   base: Lord
 }).process();
 
-const UNITS = { Calypso, Artemis };
+const Units = { Calypso, Artemis };
 
-export default UNITS;
+export default Units;
