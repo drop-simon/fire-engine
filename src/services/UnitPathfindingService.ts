@@ -2,26 +2,8 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { Chapter } from "./ChapterManagementService";
 import { UnitType, TerrainType } from "../types";
-import { Terrain } from "../constants";
-
-export const TILES = {
-  D: Terrain.Desert,
-  G: Terrain.Gate,
-  I: Terrain.Pillar,
-  N: Terrain.Plain,
-  R: Terrain.Floor,
-  K: Terrain.Thicket,
-  P: Terrain.Peak,
-  F: Terrain.Forest,
-  S: Terrain.Sea,
-  T: Terrain.Throne,
-  W: Terrain.Wall,
-  C: Terrain.Chest,
-  V: Terrain.Void,
-  A: Terrain.Gap
-} as const;
+import { ConfiguredMapType } from "./MapManagementService";
 
 export type Coordinates = {
   x: number;
@@ -53,7 +35,7 @@ type CommitToPath = (
     next: () => void;
     abort: () => void;
   }) => any
-) => Promise<void>;
+) => Promise<void> | void;
 
 type GetPathTo = (args: {
   start: Coordinates;
@@ -62,7 +44,7 @@ type GetPathTo = (args: {
 }) => TerrainWithKey[];
 
 export default class UnitPathfindingService {
-  chapter: Chapter;
+  config: ConfiguredMapType;
   unit: UnitType;
   currentCoordinates: Coordinates;
   processedTiles: TerrainWithKey[] = [];
@@ -70,19 +52,22 @@ export default class UnitPathfindingService {
   graph = new Graph();
 
   constructor({
-    chapter,
-    unit,
-    coordinates
+    unitCoordinates,
+    config
   }: {
-    chapter: Chapter;
-    unit: UnitType;
-    coordinates: Coordinates;
+    unitCoordinates: UnitCoordinates;
+    config: ConfiguredMapType;
   }) {
-    this.chapter = chapter;
-    this.unit = unit;
+    const _unitCoordinates = config.units.find(
+      ({ unit }) => unit.name === unitCoordinates.unit.name
+    );
+    if (!_unitCoordinates) {
+      return;
+    }
+    const { coordinates, unit } = _unitCoordinates;
     this.currentCoordinates = coordinates;
 
-    chapter.map.terrain.forEach((row, y) => {
+    config.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
         const tile = this.getTile({ x, y });
@@ -131,13 +116,13 @@ export default class UnitPathfindingService {
     return mappedPath;
   };
 
-  commitToPath: CommitToPath = (path, iterator) =>
-    new Promise(resolve => {
-      if (!iterator) {
-        this.currentCoordinates = path[path.length - 1].coordinates;
-        return;
-      }
+  commitToPath: CommitToPath = (path, iterator) => {
+    if (!iterator) {
+      this.currentCoordinates = path[path.length - 1].coordinates;
+      return;
+    }
 
+    return new Promise(resolve => {
       let shouldAbort = false;
       let index = -1;
       const abort = () => (shouldAbort = true);
@@ -153,6 +138,7 @@ export default class UnitPathfindingService {
       };
       next();
     });
+  };
 
   getWalkableTiles() {
     const fullMovementRange = this.getFullMovementRange();
@@ -207,23 +193,19 @@ export default class UnitPathfindingService {
     );
 
   private isWithinBounds = ({ x, y }: Coordinates) => {
-    const { width, height } = this.chapter.size;
+    const { width, height } = this.config.map.size;
     const outOfBoundsX = x < 0 || x > width;
     const outOfBoundsY = y < 0 || y > height;
     return !(outOfBoundsX || outOfBoundsY);
   };
 
   private getTile({ x, y }: Coordinates): TerrainWithKey {
-    const { map } = this.chapter;
+    const { map } = this.config;
     const row = map.terrain[y];
     if (!row) {
       return null;
     }
-    const tile = row[x];
-    if (!tile) {
-      return null;
-    }
-    const terrainCreator = TILES[tile as keyof typeof TILES];
+    const terrainCreator = row[x];
     if (!terrainCreator) {
       return null;
     }
