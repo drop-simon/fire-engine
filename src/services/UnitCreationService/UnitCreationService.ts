@@ -35,7 +35,7 @@ export default class UnitCreationService<
 
   private calculateAffinity() {
     const { birthMonth, bloodType } = this.config;
-    return Months[birthMonth].BloodTypeAffinities[bloodType];
+    return Months[birthMonth].bloodTypeAffinities[bloodType];
   }
 
   private createGrowthRates() {

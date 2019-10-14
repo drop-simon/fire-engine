@@ -92,7 +92,7 @@ export const Affinities = {
 
 export const Months = {
   January: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Ice,
       B: Affinities.Wind,
       O: Affinities.Fire,
@@ -100,7 +100,7 @@ export const Months = {
     }
   },
   February: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Wind,
       B: Affinities.Fire,
       O: Affinities.Thunder,
@@ -108,7 +108,7 @@ export const Months = {
     }
   },
   March: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Ice,
       B: Affinities.Wind,
       O: Affinities.Anima,
@@ -116,7 +116,7 @@ export const Months = {
     }
   },
   April: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Anima,
       B: Affinities.Fire,
       O: Affinities.Thunder,
@@ -124,7 +124,7 @@ export const Months = {
     }
   },
   May: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Light,
       B: Affinities.Thunder,
       O: Affinities.Fire,
@@ -132,7 +132,7 @@ export const Months = {
     }
   },
   June: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Thunder,
       B: Affinities.Anima,
       O: Affinities.Wind,
@@ -140,7 +140,7 @@ export const Months = {
     }
   },
   July: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Anima,
       B: Affinities.Wind,
       O: Affinities.Ice,
@@ -148,7 +148,7 @@ export const Months = {
     }
   },
   August: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Wind,
       B: Affinities.Dark,
       O: Affinities.Fire,
@@ -156,7 +156,7 @@ export const Months = {
     }
   },
   September: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Fire,
       B: Affinities.Ice,
       O: Affinities.Anima,
@@ -164,7 +164,7 @@ export const Months = {
     }
   },
   October: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Ice,
       B: Affinities.Anima,
       O: Affinities.Wind,
@@ -172,7 +172,7 @@ export const Months = {
     }
   },
   November: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Anima,
       B: Affinities.Thunder,
       O: Affinities.Ice,
@@ -180,7 +180,7 @@ export const Months = {
     }
   },
   December: {
-    BloodTypeAffinities: {
+    bloodTypeAffinities: {
       A: Affinities.Thunder,
       B: Affinities.Fire,
       O: Affinities.Wind,
