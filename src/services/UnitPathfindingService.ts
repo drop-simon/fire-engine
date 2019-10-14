@@ -52,7 +52,7 @@ type CommitToPath = (
     next: () => void;
     abort: () => void;
   }) => any
-) => void;
+) => Promise<void>;
 
 type GetPathTo = (args: {
   start: Coordinates;
@@ -130,26 +130,28 @@ export default class UnitPathfindingService<G extends ChapterGoalType> {
     return mappedPath;
   };
 
-  commitToPath: CommitToPath = (path, iterator) => {
-    if (!iterator) {
-      this.currentCoordinates = path[path.length - 1].coordinates;
-      return;
-    }
-
-    let shouldAbort = false;
-    let index = -1;
-    const abort = () => (shouldAbort = true);
-    const next = () => {
-      index++;
-      if (shouldAbort || index === path.length) {
-        this.currentCoordinates = path[index - 1].coordinates;
+  commitToPath: CommitToPath = (path, iterator) =>
+    new Promise(resolve => {
+      if (!iterator) {
+        this.currentCoordinates = path[path.length - 1].coordinates;
         return;
       }
-      const tile = path[index];
-      iterator({ tile, index, next, abort });
-    };
-    next();
-  };
+
+      let shouldAbort = false;
+      let index = -1;
+      const abort = () => (shouldAbort = true);
+      const next = () => {
+        index++;
+        if (shouldAbort || index === path.length) {
+          this.currentCoordinates = path[index - 1].coordinates;
+          resolve();
+          return;
+        }
+        const tile = path[index];
+        iterator({ tile, index, next, abort });
+      };
+      next();
+    });
 
   getWalkableTiles() {
     const fullMovementRange = this.getFullMovementRange();
