@@ -4,8 +4,8 @@ import {
   StatGrowthRateListType
 } from "../types";
 import EventService from "./EventService";
-import { Units } from "../constants";
 import UnitManagementService from "./UnitManagementService";
+import { DialogueQueue } from "./DialogueManagementService";
 
 type GameEventHandlers = {
   unitLevelUp: (args: {
@@ -13,6 +13,7 @@ type GameEventHandlers = {
     prevStats: StatGrowthRateListType;
     nextStats: StatGrowthRateListType;
   }) => any;
+  dialogue: (dialogueQueue: DialogueQueue) => any;
 };
 
 export default class GameManagementService extends EventService<
@@ -21,13 +22,6 @@ export default class GameManagementService extends EventService<
   unitClasses = new Map<string, AnyUnitClassConfigType>();
   units = new Map<string, UnitType>();
   chapters = new Map();
-
-  testing() {
-    const calypso = this.registerUnit(Units.Calypso)
-      .getUnit("Calypso")
-      .levelUp();
-    console.log(calypso.unit);
-  }
 
   registerUnit(unit: UnitType) {
     this.units.set(unit.name, unit);
@@ -42,5 +36,3 @@ export default class GameManagementService extends EventService<
     return new UnitManagementService({ unit, gameManager: this });
   }
 }
-
-new GameManagementService().testing();
