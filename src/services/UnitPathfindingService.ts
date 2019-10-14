@@ -2,11 +2,7 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import {
-  Chapter,
-  ChapterGoalType,
-  Coordinates
-} from "./ChapterManagementService";
+import { Chapter } from "./ChapterManagementService";
 import { UnitType, TerrainType } from "../types";
 import { Terrain } from "../constants";
 
@@ -27,8 +23,13 @@ export const TILES = {
   A: Terrain.Gap
 } as const;
 
-export type UnitCoordinates<U extends UnitType = UnitType> = {
-  unit: U;
+export type Coordinates = {
+  x: number;
+  y: number;
+};
+
+export type UnitCoordinates = {
+  unit: UnitType;
   coordinates: Coordinates;
 };
 
@@ -60,8 +61,8 @@ type GetPathTo = (args: {
   uninterrupted?: boolean;
 }) => TerrainWithKey[];
 
-export default class UnitPathfindingService<G extends ChapterGoalType> {
-  chapter: Chapter<G>;
+export default class UnitPathfindingService {
+  chapter: Chapter;
   unit: UnitType;
   currentCoordinates: Coordinates;
   processedTiles: TerrainWithKey[] = [];
@@ -73,7 +74,7 @@ export default class UnitPathfindingService<G extends ChapterGoalType> {
     unit,
     coordinates
   }: {
-    chapter: Chapter<G>;
+    chapter: Chapter;
     unit: UnitType;
     coordinates: Coordinates;
   }) {

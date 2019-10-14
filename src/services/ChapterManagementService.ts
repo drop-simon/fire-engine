@@ -4,69 +4,30 @@ import UnitPathfindingService, {
 } from "./UnitPathfindingService";
 import UNITS from "../constants/units";
 
-type ChapterGoal = {
+type ChapterGoalType = {
   description: string;
   endCondition: (map: any) => boolean;
+  failCondition: (map: any) => boolean;
 };
 
-type ChapterGoalCreator<N extends any = any> = (data: N) => ChapterGoal;
-
-const SURVIVE: ChapterGoalCreator<number> = (n: number) => ({
-  description: `Survive ${n} turns`,
-  endCondition: (map: any) => map.turn === n
-});
-
-const DEFEAT_ALL: ChapterGoal = {
-  description: `Defeat all enemies`,
-  endCondition: (map: any) => map.numEnemies === 0
-};
-
-const CAPTURE_GATE: ChapterGoal = {
-  description: `Seize the gate`,
-  endCondition: (map: any) => map.numEnemies === 0
-};
-
-const CAPTURE_THRONE: ChapterGoal = {
-  description: `Seize the throne`,
-  endCondition: (map: any) => map.numEnemies === 0
-};
-
-const CHAPTER_GOALS = {
-  SURVIVE,
-  DEFEAT_ALL,
-  CAPTURE_THRONE,
-  CAPTURE_GATE
-} as const;
-
-export type ChapterGoalType = keyof typeof CHAPTER_GOALS;
-
-export type Coordinates = { x: number; y: number };
-
-type Goal<G extends ChapterGoalType> = G extends "SURVIVE"
-  ? { type: G; data: number }
-  : { type: G };
-
-interface ChapterManagementServiceConstructor<G extends ChapterGoalType> {
+interface ChapterManagementServiceConstructor {
   map: { terrain: string[]; tileSet: string };
-  goal: Goal<G>;
+  goal: ChapterGoalType;
   unitStartingPoints: UnitCoordinates[];
   enemyStartingPoints: UnitCoordinates[];
 }
 
-export type Chapter<
-  G extends ChapterGoalType,
-  U extends UnitType = UnitType
-> = {
+export type Chapter = {
   map: { terrain: string[][]; tileSet: string };
-  unitStartingPoints: UnitCoordinates<U>[];
-  enemyStartingPoints: UnitCoordinates<U>[];
-  goal: G extends "SURVIVE" ? { type: G; data: number } : { type: G };
+  unitStartingPoints: UnitCoordinates[];
+  enemyStartingPoints: UnitCoordinates[];
+  goal: ChapterGoalType;
   size: { width: number; height: number };
 };
 
 export default class ChapterManagementService<G extends ChapterGoalType> {
-  chapter: Chapter<G>;
-  pathfinders: { [key: string]: UnitPathfindingService<G> };
+  chapter: Chapter;
+  pathfinders: { [key: string]: UnitPathfindingService };
   pauseInteractions = true;
 
   constructor({
@@ -74,7 +35,7 @@ export default class ChapterManagementService<G extends ChapterGoalType> {
     unitStartingPoints,
     enemyStartingPoints,
     goal
-  }: ChapterManagementServiceConstructor<G>) {
+  }: ChapterManagementServiceConstructor) {
     this.chapter = {
       map: {
         terrain: terrain.map(row => row.split("")),
@@ -90,7 +51,7 @@ export default class ChapterManagementService<G extends ChapterGoalType> {
     };
     this.pathfinders = unitStartingPoints.reduce(
       (acc, { unit, coordinates }) => {
-        const pathfinder = new UnitPathfindingService<G>({
+        const pathfinder = new UnitPathfindingService({
           chapter: this.chapter,
           unit,
           coordinates
@@ -98,7 +59,7 @@ export default class ChapterManagementService<G extends ChapterGoalType> {
         acc[unit.name] = pathfinder;
         return acc;
       },
-      {} as { [key: string]: UnitPathfindingService<G> }
+      {} as { [key: string]: UnitPathfindingService }
     );
   }
 }
