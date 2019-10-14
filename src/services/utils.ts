@@ -1,4 +1,4 @@
-import { StatList, StatGrowthRateList } from "../types";
+import { StatListType, StatGrowthRateListType } from "../types";
 
 // probability is a float between 0 and 1
 export const getProbabilityResult = (probability: number) =>
@@ -8,8 +8,8 @@ export const increaseStats = ({
   currentStats,
   growthRates
 }: {
-  currentStats: StatList;
-  growthRates: StatGrowthRateList;
+  currentStats: StatListType;
+  growthRates: StatGrowthRateListType;
 }) => {
   const nextStats = { ...currentStats };
   for (const key in growthRates) {

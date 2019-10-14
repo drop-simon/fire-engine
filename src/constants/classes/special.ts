@@ -1,8 +1,8 @@
-import { UnitClass } from "../../types";
+import { SpecialUnitClassConfigType } from "../../types";
 
-export const Magic_Seal: UnitClass<"SPECIAL"> = {
+export const MagicSeal: SpecialUnitClassConfigType = {
   name: "Magic Seal",
-  category: "SPECIAL",
+  category: "Special",
   flying: false,
   horseback: false,
   armored: false,
@@ -23,9 +23,9 @@ export const Magic_Seal: UnitClass<"SPECIAL"> = {
   }
 };
 
-export const Dancer: UnitClass<"SPECIAL"> = {
+export const Dancer: SpecialUnitClassConfigType = {
   name: "Dancer",
-  category: "SPECIAL",
+  category: "Special",
   flying: false,
   horseback: false,
   armored: false,
@@ -46,9 +46,9 @@ export const Dancer: UnitClass<"SPECIAL"> = {
   }
 };
 
-export const Bard: UnitClass<"SPECIAL"> = {
+export const Bard: SpecialUnitClassConfigType = {
   name: "Bard",
-  category: "SPECIAL",
+  category: "Special",
   flying: false,
   horseback: false,
   armored: false,

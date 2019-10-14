@@ -1,41 +1,45 @@
 import merge from "lodash/merge";
-import { UnitClass, CombatCategory, UnitConfig, Unit } from "../types";
+import {
+  UnitConfigType,
+  UnitType,
+  AnyUnitClassConfigType,
+  AnyUnitType,
+  CombatCategoryType
+} from "../types";
 import UnitCreationService from "./UnitCreationService";
 import EventService from "./EventService";
 
 type GameEventHandlers = {
-  battleStart: (unit: Unit) => void;
+  battleStart: (unit: AnyUnitType) => void;
   battleEnd: (args: { success: boolean }) => void;
 };
 
 export default class GameManagementService extends EventService<
   GameEventHandlers
 > {
-  unitClasses = new Map<string, UnitClass>();
-  units = new Map<string, Unit>();
+  unitClasses = new Map<string, AnyUnitClassConfigType>();
+  units = new Map<string, AnyUnitType>();
   chapters = new Map();
 
-  registerUnitClass<C extends CombatCategory>(unitClass: UnitClass<C>) {
+  registerUnitClass<U extends AnyUnitClassConfigType>(unitClass: U) {
     this.unitClasses.set(unitClass.name, unitClass);
-    return unitClass;
+    return this;
   }
 
-  registerUnit<C extends CombatCategory, U extends UnitClass<C>>(
-    unitConfig: UnitConfig<C, U>
-  ) {
-    const unit = new UnitCreationService(unitConfig).process();
+  registerUnit<C extends CombatCategoryType>(unitConfig: UnitConfigType<C>) {
+    const unit = new UnitCreationService<C>(unitConfig).process();
     this.units.set(unitConfig.name, unit);
-    return unit;
+    return this;
   }
 
-  updateUnit(unitName: string, updates: Partial<Unit>) {
+  updateUnit(unitName: string, updates: Partial<UnitType>) {
     const unit = this.getUnit(unitName);
     if (!unit) {
-      return null;
+      return this;
     }
     const updatedUnit = merge(unit, updates);
     this.units.set(unitName, updatedUnit);
-    return updatedUnit;
+    return this;
   }
 
   getUnit(unitName: string) {

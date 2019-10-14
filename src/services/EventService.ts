@@ -22,8 +22,6 @@ export default class EventService<T extends EventHandlerMap> {
     eventHandler: F
   ) {
     if (!this.handlers[eventName]) {
-      return this;
-    } else {
       this.handlers[eventName] = this.handlers[eventName].filter(
         handler => handler !== eventHandler
       );
@@ -36,6 +34,7 @@ export default class EventService<T extends EventHandlerMap> {
     ...args: Parameters<F>
   ) {
     const handlers = this.handlers[eventName] || [];
-    handlers.forEach(handler => handler(args));
+    handlers.forEach(handler => handler(...(args as any[])));
+    return this;
   }
 }

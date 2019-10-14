@@ -1,10 +1,15 @@
-import { Weapon, CombatCategory, Unit, UnitConfig } from "../types";
+import {
+  WeaponType,
+  CombatCategoryType,
+  UnitType,
+  UnitConfigType
+} from "../types";
 import { increaseStats } from "./utils";
 
 export default class UnitManagementService {
-  unit: Unit;
+  unit: UnitType;
 
-  constructor(unit: Unit) {
+  constructor(unit: UnitType) {
     this.unit = unit;
   }
 
@@ -16,19 +21,19 @@ export default class UnitManagementService {
     this.unit.stats = nextStats;
   }
 
-  get equippedWeapon(): Weapon | null {
+  get equippedWeapon(): WeaponType | null {
     const weapon = this.unit.items.find(item => {
-      const weaponCategories: CombatCategory[] = [
-        "PHYSICAL",
-        "MAGIC",
-        "SPECIAL"
+      const weaponCategories: CombatCategoryType[] = [
+        "Physical",
+        "Magic",
+        "Special"
       ];
       return weaponCategories.includes(item.category);
     });
-    return weapon as Weapon | undefined;
+    return weapon as WeaponType | undefined;
   }
 
-  get conflict() {
+  get conflictStats() {
     return {
       attackPower: this.attackPower,
       attackSpeed: this.attackSpeed,

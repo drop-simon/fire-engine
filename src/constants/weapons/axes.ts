@@ -1,8 +1,8 @@
-import { PhysicalWeaponConfig } from "../../types";
+import { PhysicalWeaponConfigType } from "../../types";
 
 const AXES = {
   ["Iron Axe"]: {
-    category: "PHYSICAL",
+    category: "Physical",
     type: "Axes",
     level: "E",
     maxUses: 45,
@@ -14,9 +14,9 @@ const AXES = {
     critical: 0,
     experience: 1,
     cost: 270
-  } as PhysicalWeaponConfig,
+  } as PhysicalWeaponConfigType,
   ["Steel Axe"]: {
-    category: "PHYSICAL",
+    category: "Physical",
     type: "Axes",
     level: "E",
     maxUses: 30,
@@ -28,9 +28,9 @@ const AXES = {
     critical: 0,
     experience: 2,
     cost: 360
-  } as PhysicalWeaponConfig,
+  } as PhysicalWeaponConfigType,
   ["Silver Axe"]: {
-    category: "PHYSICAL",
+    category: "Physical",
     type: "Axes",
     level: "A",
     maxUses: 20,
@@ -42,7 +42,7 @@ const AXES = {
     critical: 0,
     experience: 1,
     cost: 1000
-  } as PhysicalWeaponConfig
+  } as PhysicalWeaponConfigType
 };
 
 export default AXES;

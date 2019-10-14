@@ -1,3 +1,3 @@
-import { Weapon } from "./weapons";
+import { WeaponType } from "./weapons";
 
-export type Item = Weapon;
+export type ItemType = WeaponType;

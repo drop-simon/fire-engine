@@ -1,10 +1,5 @@
 import sample from "lodash/sample";
-import {
-  BirthMonth,
-  BloodType,
-  StatList,
-  StatGrowthRateList
-} from "../../types";
+import { BirthMonthType, BloodType, StatGrowthRateListType } from "../../types";
 
 const BLOOD_TYPE_MODIFIERS = {
   A: {
@@ -87,7 +82,7 @@ export const createGrowthRates = ({
   birthMonth,
   bloodType
 }: {
-  birthMonth: BirthMonth;
+  birthMonth: BirthMonthType;
   bloodType: BloodType;
 }) => {
   const growthRates = {
@@ -123,5 +118,5 @@ export const createGrowthRates = ({
     );
   });
 
-  return growthRates as StatGrowthRateList;
+  return growthRates as StatGrowthRateListType;
 };

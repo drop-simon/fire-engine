@@ -1,21 +1,4 @@
-import { StatName } from "../types";
-
-export type AffinityBonusType = {
-  power?: number;
-  defense?: number;
-  resistance?: number;
-  critical?: number;
-  criticalEvade?: number;
-  avoid?: number;
-  accuracy?: number;
-};
-
-export type AffectableStat = Exclude<StatName, "constitution" | "movement">;
-
-export type AffinityType = {
-  name: string;
-  supportBonus: AffinityBonusType;
-};
+import { AffinityType } from "../types";
 
 const Anima: AffinityType = {
   name: "Anima",

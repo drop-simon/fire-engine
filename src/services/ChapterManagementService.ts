@@ -1,4 +1,4 @@
-import { Unit } from "../types";
+import { UnitType } from "../types";
 import UnitPathfindingService, {
   UnitCoordinates
 } from "./UnitPathfindingService";
@@ -53,7 +53,10 @@ interface ChapterManagementServiceConstructor<G extends ChapterGoalType> {
   enemyStartingPoints: UnitCoordinates[];
 }
 
-export type Chapter<G extends ChapterGoalType, U extends Unit = Unit> = {
+export type Chapter<
+  G extends ChapterGoalType,
+  U extends UnitType = UnitType
+> = {
   map: { terrain: string[][]; tileSet: string };
   unitStartingPoints: UnitCoordinates<U>[];
   enemyStartingPoints: UnitCoordinates<U>[];

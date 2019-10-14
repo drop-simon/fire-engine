@@ -1,19 +1,22 @@
-import WEAPONS, { COMBAT_CATEGORIES } from "../constants/weapons";
+import { Weapons, CombatCategories } from "../constants";
 
-export type PhysicalWeapon = "Swords" | "Lances" | "Axes" | "Bows";
+export type PhysicalWeaponType = "Swords" | "Lances" | "Axes" | "Bows";
 
-export type MagicWeapon = "Anima" | "Light" | "Dark" | "Staves";
+export type MagicWeaponType = "Anima" | "Light" | "Dark" | "Staves";
 
-export type SpecialWeapon = "Ring" | "Instrument" | "None";
+export type SpecialWeaponType = "Ring" | "Instrument" | "None";
 
-export type AnyWeapon = PhysicalWeapon | MagicWeapon | SpecialWeapon;
+export type AnyWeaponType =
+  | PhysicalWeaponType
+  | MagicWeaponType
+  | SpecialWeaponType;
 
-export type WeaponLevel = "S" | "A" | "B" | "C" | "D" | "E";
+export type WeaponLevelType = "S" | "A" | "B" | "C" | "D" | "E";
 
-export type CombatCategory = keyof typeof COMBAT_CATEGORIES;
+export type CombatCategoryType = keyof typeof CombatCategories;
 
-export type WeaponEffect = (
-  weapon: Weapon
+export type WeaponEffectType = (
+  weapon: WeaponType
 ) => {
   power: number;
   weight: number;
@@ -21,16 +24,16 @@ export type WeaponEffect = (
   critical: number;
 };
 
-export interface WeaponConfig<C extends CombatCategory> {
+export interface WeaponConfigType<C extends CombatCategoryType> {
   category: C;
-  type: C extends "MAGIC"
-    ? MagicWeapon
-    : C extends "PHYSICAL"
-    ? PhysicalWeapon
-    : SpecialWeapon;
-  level: C extends "SPECIAL" ? null : WeaponLevel;
+  type: C extends "Magic"
+    ? MagicWeaponType
+    : C extends "Physical"
+    ? PhysicalWeaponType
+    : SpecialWeaponType;
+  level: C extends "Special" ? null : WeaponLevelType;
   description?: string;
-  effects?: WeaponEffect;
+  effects?: WeaponEffectType;
   power: number;
   weight: number;
   accuracy: number;
@@ -41,10 +44,10 @@ export interface WeaponConfig<C extends CombatCategory> {
   range: [number, number];
   cost?: number;
 }
-export type PhysicalWeaponConfig = WeaponConfig<"PHYSICAL">;
-export type MagicWeaponConfig = WeaponConfig<"MAGIC">;
-export type SpecialWeaponConfig = WeaponConfig<"SPECIAL">;
+export type PhysicalWeaponConfigType = WeaponConfigType<"Physical">;
+export type MagicWeaponConfigType = WeaponConfigType<"Magic">;
+export type SpecialWeaponConfigType = WeaponConfigType<"Special">;
 
-export type WeaponName = keyof typeof WEAPONS;
+export type WeaponNameType = keyof typeof Weapons;
 
-export type Weapon = typeof WEAPONS[WeaponName];
+export type WeaponType = typeof Weapons[WeaponNameType];

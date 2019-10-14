@@ -1,9 +1,9 @@
-import Terrain from "../constants/terrain";
-import { UnitDependantFunction } from ".";
+import { Terrain } from "../constants";
+import { UnitDependantFunctionType } from ".";
 
-export type TerrainName = keyof typeof Terrain;
+export type TerrainNameType = keyof typeof Terrain;
 
-export type TerrainCreator = UnitDependantFunction<{
+export type TerrainCreatorType = UnitDependantFunctionType<{
   movementCost: number;
   effects: {
     static: {
@@ -16,4 +16,4 @@ export type TerrainCreator = UnitDependantFunction<{
   };
 }>;
 
-export type TerrainType = ReturnType<TerrainCreator>;
+export type TerrainType = ReturnType<TerrainCreatorType>;

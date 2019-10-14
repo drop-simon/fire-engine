@@ -1,9 +1,9 @@
-import { Unit, ManagedUnit } from "../types";
+import { UnitType, ManagedUnitType } from "../types";
 import { getProbabilityResult } from "./utils";
 
 interface BattleConstructor {
-  defender: ManagedUnit;
-  aggressor: ManagedUnit;
+  defender: ManagedUnitType;
+  aggressor: ManagedUnitType;
 }
 
 type Target = "aggressor" | "defender";
@@ -16,9 +16,12 @@ type ProcessTurnResult = {
   damage: number;
 };
 
-export default class BattleManagementService<U extends Unit, V extends Unit> {
-  defender: ManagedUnit;
-  aggressor: ManagedUnit;
+export default class BattleManagementService<
+  U extends UnitType,
+  V extends UnitType
+> {
+  defender: ManagedUnitType;
+  aggressor: ManagedUnitType;
 
   constructor({ defender, aggressor }: BattleConstructor) {
     this.defender = defender;
@@ -78,31 +81,32 @@ export default class BattleManagementService<U extends Unit, V extends Unit> {
 
   private getDamage(target: Target) {
     const { aggressor, defender } = this.getParticipants(target);
-    const isMagicAttack = aggressor.unit.base.category === "MAGIC";
+    const isMagicAttack = aggressor.unit.base.category === "Magic";
     const damage = isMagicAttack
-      ? aggressor.conflict.attackPower - defender.unit.stats.resistance
-      : aggressor.conflict.attackPower - defender.unit.stats.defense;
+      ? aggressor.conflictStats.attackPower - defender.unit.stats.resistance
+      : aggressor.conflictStats.attackPower - defender.unit.stats.defense;
 
     return damage;
   }
 
   private getAccuracy(target: Target) {
     const { aggressor, defender } = this.getParticipants(target);
-    const accuracy = aggressor.conflict.accuracy - defender.conflict.avoid;
+    const accuracy =
+      aggressor.conflictStats.accuracy - defender.conflictStats.avoid;
     return accuracy;
   }
 
   private getCritical(target: Target) {
     const { aggressor, defender } = this.getParticipants(target);
     const critical =
-      aggressor.conflict.critical - defender.conflict.criticalAvoid;
+      aggressor.conflictStats.critical - defender.conflictStats.criticalAvoid;
     return critical;
   }
 
   private getNumberOfTurns(target: Target) {
     const { aggressor, defender } = this.getParticipants(target);
     const attackSpeedDifference =
-      aggressor.conflict.attackSpeed - defender.conflict.attackSpeed;
+      aggressor.conflictStats.attackSpeed - defender.conflictStats.attackSpeed;
     const numberOfTurns = attackSpeedDifference >= 4 ? 2 : 1;
     return numberOfTurns;
   }

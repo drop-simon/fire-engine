@@ -1,20 +1,17 @@
 import {
-  UnitConfig,
-  StatGrowthRateList,
-  StatList,
-  CombatCategory,
-  UnitClass
+  UnitConfigType,
+  StatGrowthRateListType,
+  StatListType,
+  AnyUnitClassConfigType,
+  CombatCategoryType
 } from "../../types";
 import { Months } from "../../constants";
 import { createGrowthRates } from "./utils";
 import { increaseStats } from "../utils";
 
-export default class UnitCreationService<
-  C extends CombatCategory,
-  U extends UnitClass<C>
-> {
-  config: UnitConfig<C, U>;
-  constructor(config: UnitConfig<C, U>) {
+export default class UnitCreationService<C extends CombatCategoryType> {
+  config: UnitConfigType<C>;
+  constructor(config: UnitConfigType<C>) {
     this.config = config;
   }
 
@@ -46,10 +43,10 @@ export default class UnitCreationService<
     growthRates,
     level
   }: {
-    growthRates: StatGrowthRateList;
+    growthRates: StatGrowthRateListType;
     level: number;
   }) => {
-    let stats: StatList = {
+    let stats: StatListType = {
       health: 5,
       power: 0,
       skill: 0,

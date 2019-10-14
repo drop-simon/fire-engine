@@ -1,8 +1,8 @@
-import { UnitClass } from "../../types";
+import { MagicUnitClassConfigType } from "../../types";
 
-export const Pupil: UnitClass<"MAGIC"> = {
+export const Pupil: MagicUnitClassConfigType = {
   name: "Pupil",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -22,9 +22,9 @@ export const Pupil: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Mage: UnitClass<"MAGIC"> = {
+export const Mage: MagicUnitClassConfigType = {
   name: "Mage",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -44,9 +44,9 @@ export const Mage: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Shaman: UnitClass<"MAGIC"> = {
+export const Shaman: MagicUnitClassConfigType = {
   name: "Shaman",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -66,9 +66,9 @@ export const Shaman: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Monk: UnitClass<"MAGIC"> = {
+export const Monk: MagicUnitClassConfigType = {
   name: "Monk",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -88,9 +88,9 @@ export const Monk: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Cleric: UnitClass<"MAGIC"> = {
+export const Cleric: MagicUnitClassConfigType = {
   name: "Cleric",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -110,9 +110,9 @@ export const Cleric: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Troubador: UnitClass<"MAGIC"> = {
+export const Troubador: MagicUnitClassConfigType = {
   name: "Troubador",
-  category: "MAGIC",
+  category: "Magic",
   horseback: true,
   flying: false,
   armored: false,
@@ -132,9 +132,9 @@ export const Troubador: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Valkyrie: UnitClass<"MAGIC"> = {
+export const Valkyrie: MagicUnitClassConfigType = {
   name: "Valkyrie",
-  category: "MAGIC",
+  category: "Magic",
   horseback: true,
   flying: false,
   armored: false,
@@ -154,9 +154,9 @@ export const Valkyrie: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Sage: UnitClass<"MAGIC"> = {
+export const Sage: MagicUnitClassConfigType = {
   name: "Sage",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -176,9 +176,9 @@ export const Sage: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Mage_Knight: UnitClass<"MAGIC"> = {
+export const MageKnight: MagicUnitClassConfigType = {
   name: "Mage Knight",
-  category: "MAGIC",
+  category: "Magic",
   horseback: true,
   flying: false,
   armored: false,
@@ -198,9 +198,9 @@ export const Mage_Knight: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Druid: UnitClass<"MAGIC"> = {
+export const Druid: MagicUnitClassConfigType = {
   name: "Druid",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,
@@ -220,9 +220,9 @@ export const Druid: UnitClass<"MAGIC"> = {
   }
 };
 
-export const Bishop: UnitClass<"MAGIC"> = {
+export const Bishop: MagicUnitClassConfigType = {
   name: "Bishop",
-  category: "MAGIC",
+  category: "Magic",
   horseback: false,
   flying: false,
   armored: false,

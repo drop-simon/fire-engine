@@ -7,27 +7,27 @@ import {
   ChapterGoalType,
   Coordinates
 } from "./ChapterManagementService";
-import { Unit, TerrainType } from "../types";
-import TerrainTypes from "../constants/terrain";
+import { UnitType, TerrainType } from "../types";
+import { Terrain } from "../constants";
 
 export const TILES = {
-  D: TerrainTypes.Desert,
-  G: TerrainTypes.Gate,
-  I: TerrainTypes.Pillar,
-  N: TerrainTypes.Plain,
-  R: TerrainTypes.Floor,
-  K: TerrainTypes.Thicket,
-  P: TerrainTypes.Peak,
-  F: TerrainTypes.Forest,
-  S: TerrainTypes.Sea,
-  T: TerrainTypes.Throne,
-  W: TerrainTypes.Wall,
-  C: TerrainTypes.Chest,
-  V: TerrainTypes.Void,
-  A: TerrainTypes.Gap
+  D: Terrain.Desert,
+  G: Terrain.Gate,
+  I: Terrain.Pillar,
+  N: Terrain.Plain,
+  R: Terrain.Floor,
+  K: Terrain.Thicket,
+  P: Terrain.Peak,
+  F: Terrain.Forest,
+  S: Terrain.Sea,
+  T: Terrain.Throne,
+  W: Terrain.Wall,
+  C: Terrain.Chest,
+  V: Terrain.Void,
+  A: Terrain.Gap
 } as const;
 
-export type UnitCoordinates<U extends Unit = Unit> = {
+export type UnitCoordinates<U extends UnitType = UnitType> = {
   unit: U;
   coordinates: Coordinates;
 };
@@ -62,7 +62,7 @@ type GetPathTo = (args: {
 
 export default class UnitPathfindingService<G extends ChapterGoalType> {
   chapter: Chapter<G>;
-  unit: Unit;
+  unit: UnitType;
   currentCoordinates: Coordinates;
   processedTiles: TerrainWithKey[] = [];
   tileMap = new Map<string, TerrainWithKey>();
@@ -74,7 +74,7 @@ export default class UnitPathfindingService<G extends ChapterGoalType> {
     coordinates
   }: {
     chapter: Chapter<G>;
-    unit: Unit;
+    unit: UnitType;
     coordinates: Coordinates;
   }) {
     this.chapter = chapter;

@@ -1,6 +1,6 @@
 import { Affinities, Months } from "../constants";
 
-export type BirthMonth = keyof typeof Months;
+export type BirthMonthType = keyof typeof Months;
 
 export type BloodType = "A" | "B" | "O" | "AB";
 
@@ -14,4 +14,9 @@ export type AffinityBonusType = {
   criticalEvade?: number;
   avoid?: number;
   accuracy?: number;
+};
+
+export type AffinityType = {
+  name: string;
+  supportBonus: AffinityBonusType;
 };

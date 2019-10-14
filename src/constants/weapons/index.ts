@@ -1,13 +1,11 @@
-import AXES from "./axes";
+import axes from "./axes";
 
-const WEAPONS = {
-  ...AXES
+export const Weapons = {
+  ...axes
 };
 
-export const COMBAT_CATEGORIES = {
-  PHYSICAL: "PHYSICAL",
-  MAGIC: "MAGIC",
-  SPECIAL: "SPECIAL"
+export const CombatCategories = {
+  Physical: "Physical",
+  Magic: "Magic",
+  Special: "Special"
 } as const;
-
-export default WEAPONS;
