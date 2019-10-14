@@ -9,21 +9,10 @@ import {
   BloodType
 } from ".";
 import { Item } from "./item";
-import { Affinities } from "../constants";
 import UNITS from "../constants/units";
 import UnitCreationService from "../services/UnitCreationService";
 import UnitManagementService from "../services/UnitManagementService";
 import { CombatCategory } from "./weapons";
-
-export type UnitAffinity = keyof typeof Affinities;
-
-export type SupportLevel = "A" | "B" | "C";
-
-export type SupportDialogue = {
-  character: string;
-  angry?: boolean;
-  text: string;
-}[];
 
 export type PhysicalUnitType =
   | "Archer"
@@ -124,6 +113,13 @@ export type StatModifier = {
   turns: number;
 };
 
+export type SupportLevel = "A" | "B" | "C";
+
+export type SupportDialogue = {
+  character: string;
+  text: string;
+}[];
+
 export interface UnitSupport {
   units: [string, string];
   dialogue: {
@@ -141,7 +137,7 @@ export interface UnitConfig<C extends CombatCategory, U extends UnitClass<C>> {
   bloodType: BloodType;
   level: number;
   base: U;
-  supports: UnitSupport[];
+  supports: { [unitName: string]: SupportLevel };
   items: Item[];
   weaponLevels: {
     weapon: C extends "PHYSICAL"

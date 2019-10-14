@@ -6,7 +6,6 @@ import {
   UnitClass
 } from "../../types";
 import { Months } from "../../constants";
-import CLASSES from "../../constants/classes";
 import { createGrowthRates } from "./utils";
 import { increaseStats } from "../utils";
 

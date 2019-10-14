@@ -10,7 +10,7 @@ export const Calypso = new UnitCreationService({
   sex: "F",
   items: [WEAPONS["Silver Axe"]],
   weaponLevels: [{ weapon: "Axes", level: "A" }],
-  supports: [],
+  supports: {},
   base: Lord
 }).process();
 
@@ -22,7 +22,7 @@ export const Artemis = new UnitCreationService({
   sex: "M",
   items: [WEAPONS["Silver Axe"]],
   weaponLevels: [{ weapon: "Axes", level: "A" }],
-  supports: [],
+  supports: {},
   base: Lord
 }).process();
 

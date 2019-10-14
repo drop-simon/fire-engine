@@ -8,20 +8,20 @@ import {
 
 const BLOOD_TYPE_MODIFIERS = {
   A: {
-    BENEFIT: ["power", "skill", "health", "luck"],
-    DETRIMENT: ["speed", "defense", "resistance"]
+    BENEFIT: ["speed", "power", "health", "luck"],
+    DETRIMENT: ["skill", "defense", "resistance"]
   },
   B: {
-    BENEFIT: ["defense", "defense", "luck", "speed"],
-    DETRIMENT: ["power", "health", "resistance"]
+    BENEFIT: ["power", "health", "speed", "resistance"],
+    DETRIMENT: ["defense", "skill", "luck"]
   },
   O: {
-    BENEFIT: ["health", "speed", "resistance", "power"],
-    DETRIMENT: ["skill", "defense", "luck"]
+    BENEFIT: ["health", "defense", "skill", "luck"],
+    DETRIMENT: ["resistance", "speed", "power"]
   },
   AB: {
-    BENEFIT: ["speed", "defense", "resistance", "skill"],
-    DETRIMENT: ["health", "luck", "power"]
+    BENEFIT: ["power", "defense", "resistance", "skill"],
+    DETRIMENT: ["health", "luck", "speed"]
   }
 } as const;
 
@@ -77,14 +77,11 @@ const BIRTH_MONTH_MODIFIERS = {
 } as const;
 
 const BASE_GROWTH_RATE = 0.5;
-const BENEFICIAL_GROWTH_RATE_MODIFIERS = [0.1, 0.15, 0.2];
-const DETRIMENTAL_GROWTH_RATE_MODIFIERS = [-0.1, -0.15, -0.2];
+const GROWTH_RATE_MODIFIERS = [0.05, 0.1, 0.15, 0.2];
 
-const getBeneficialGrowthModifier = () =>
-  sample(BENEFICIAL_GROWTH_RATE_MODIFIERS);
+const getBeneficialGrowthModifier = () => sample(GROWTH_RATE_MODIFIERS);
 
-const getDetrimentalGrowthModifier = () =>
-  sample(DETRIMENTAL_GROWTH_RATE_MODIFIERS);
+const getDetrimentalGrowthModifier = () => sample(GROWTH_RATE_MODIFIERS) * -1;
 
 export const createGrowthRates = ({
   birthMonth,
