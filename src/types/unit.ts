@@ -158,3 +158,5 @@ export type Unit<C extends CombatCategory = CombatCategory> = ReturnType<
 export type UnitName = keyof typeof UNITS;
 
 export type ManagedUnit = UnitManagementService;
+
+export type UnitDependantFunction<T extends any> = (unit: Unit) => T;
