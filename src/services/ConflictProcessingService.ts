@@ -1,7 +1,7 @@
 import { UnitType, ManagedUnitType } from "../types";
 import { getProbabilityResult } from "./utils";
 
-interface ConflictManagementServiceConstructor {
+interface ConflictProcessingServiceConstructor {
   defender: ManagedUnitType;
   aggressor: ManagedUnitType;
 }
@@ -16,14 +16,18 @@ type ProcessTurnResult = {
   damage: number;
 };
 
-export default class ConflictManagementService<
+export type ConflictQueue = ReturnType<
+  ConflictProcessingService<UnitType, UnitType>["process"]
+>;
+
+export default class ConflictProcessingService<
   U extends UnitType,
   V extends UnitType
 > {
   defender: ManagedUnitType;
   aggressor: ManagedUnitType;
 
-  constructor({ defender, aggressor }: ConflictManagementServiceConstructor) {
+  constructor({ defender, aggressor }: ConflictProcessingServiceConstructor) {
     this.defender = defender;
     this.aggressor = aggressor;
   }

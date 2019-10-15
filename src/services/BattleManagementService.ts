@@ -1,20 +1,55 @@
-import { ConfiguredMapType } from "./MapManagementService";
-import { ChapterGoalType } from "./ChapterManagementService";
+import MapManagementService, {
+  MapManagementServiceConstructor
+} from "./MapManagementService";
+import { ChapterGoalType } from "./ChapterCreationService";
+import { Coordinates, UnitCoordinates } from "./UnitPathfindingService";
 
-interface BattleManagementServiceConstructor {
-  mapConfig: ConfiguredMapType;
+interface BattleManagementServiceConstructor
+  extends MapManagementServiceConstructor {
   goal: ChapterGoalType;
+  possibleStartCoordinates: Coordinates[];
 }
 
 export default class BattleManagementService {
-  mapConfig: ConfiguredMapType;
   goal: ChapterGoalType;
-  numTurns = 0;
+  possibleStartCoordinates: Coordinates[];
 
-  constructor({ mapConfig, goal }: BattleManagementServiceConstructor) {
-    this.mapConfig = mapConfig;
+  mapManager: MapManagementService;
+  unitStartCoordinates: UnitCoordinates[] = [];
+  numTurns = 0;
+  turn: "player" | "computer";
+
+  constructor({
+    goal,
+    possibleStartCoordinates,
+    map,
+    units
+  }: BattleManagementServiceConstructor) {
     this.goal = goal;
+    this.possibleStartCoordinates = possibleStartCoordinates;
+    this.mapManager = new MapManagementService({ map, units });
   }
 
-  process() {}
+  setUnitStartCoords({ unit, coordinates }: UnitCoordinates) {
+    const isValidStartingPosition = this.possibleStartCoordinates.some(
+      ({ x, y }) => x === coordinates.x && y === coordinates.y
+    );
+    if (isValidStartingPosition) {
+      this.unitStartCoordinates = this.unitStartCoordinates
+        .filter(
+          ({ coordinates: { x, y } }) =>
+            x === coordinates.x && y === coordinates.y
+        )
+        .concat({ unit, coordinates });
+    }
+    return this;
+  }
+
+  start() {
+    this.mapManager.addUnits(this.unitStartCoordinates);
+  }
+
+  private endTurn() {}
+
+  private processEnemyTurn() {}
 }

@@ -3,9 +3,11 @@ import {
   AnyUnitClassConfigType,
   StatGrowthRateListType
 } from "../types";
-import EventService from "./EventService";
+import EventEmitterService from "./EventEmitterService";
 import UnitManagementService from "./UnitManagementService";
-import { DialogueQueue } from "./DialogueManagementService";
+import { DialogueQueue } from "./DialogueCreationService";
+import { ChapterQueue } from "./ChapterCreationService";
+import { ConflictQueue } from "./ConflictProcessingService";
 
 type GameEventHandlers = {
   unitLevelUp: (args: {
@@ -13,18 +15,35 @@ type GameEventHandlers = {
     prevStats: StatGrowthRateListType;
     nextStats: StatGrowthRateListType;
   }) => any;
-  dialogue: (dialogueQueue: DialogueQueue) => any;
+  // dialogue: (queue: DialogueQueue) => any;
+  // conflict: (queue: ConflictQueue) => any;
+  chapter: (queue: ChapterQueue) => any;
 };
 
-export default class GameManagementService extends EventService<
+export default class GameManagementService extends EventEmitterService<
   GameEventHandlers
 > {
   unitClasses = new Map<string, AnyUnitClassConfigType>();
   units = new Map<string, UnitType>();
-  chapters = new Map();
+  chapters: { name: string; queue: ChapterQueue }[] = [];
+
+  startGame() {}
 
   registerUnit(unit: UnitType) {
     this.units.set(unit.name, unit);
+    return this;
+  }
+
+  addChapter(chapterName: string, chapterQueue: ChapterQueue) {
+    this.chapters.push({ name: chapterName, queue: chapterQueue });
+    return this;
+  }
+
+  startChapter(chapterName: string) {
+    const chapter = this.chapters.find(({ name }) => name === chapterName);
+    if (chapter) {
+      this.emit("chapter", chapter.queue);
+    }
     return this;
   }
 

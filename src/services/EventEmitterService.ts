@@ -2,7 +2,7 @@ type EventHandlerMap = {
   [key: string]: (...args: any) => void;
 };
 
-export default class EventService<T extends EventHandlerMap> {
+export default class EventEmitterService<T extends EventHandlerMap> {
   handlers: { [key in keyof T]?: T[keyof T][] } = {};
 
   addEventListener<K extends keyof T, F extends T[K]>(

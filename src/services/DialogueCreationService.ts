@@ -1,5 +1,4 @@
 import { UnitType } from "../types";
-import GameManagementService from "./GameManagementService";
 
 const DialogueActions = {
   AddUnits: (units: UnitType[]) =>
@@ -20,22 +19,14 @@ type DialogueActionConfig = ReturnType<
   (typeof DialogueActions)[keyof typeof DialogueActions]
 >;
 
-interface DialogueManagementServiceConfigType {
-  gameManager: GameManagementService;
-}
+export type DialogueQueue = ReturnType<DialogueCreationService["process"]>;
 
-export type DialogueQueue = DialogueActionConfig[];
-
-export default class DialogueManagementService {
-  gameManager: GameManagementService;
+export default class DialogueCreationService {
   dialogueQueue: DialogueActionConfig[] = [];
   units: UnitType[] = [];
-  constructor({ gameManager }: DialogueManagementServiceConfigType) {
-    this.gameManager = gameManager;
-  }
 
   process() {
-    return this.gameManager.emit("dialogue", this.dialogueQueue);
+    return this.dialogueQueue;
   }
 
   addUnits(units: UnitType[]) {

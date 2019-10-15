@@ -3,7 +3,8 @@ import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
 import { UnitType, TerrainType } from "../types";
-import { ConfiguredMapType } from "./MapManagementService";
+import { MapConfigType } from "./MapManagementService";
+import { getMapSize } from "./utils";
 
 export type Coordinates = {
   x: number;
@@ -44,7 +45,7 @@ type GetPathTo = (args: {
 }) => TerrainWithKey[];
 
 export default class UnitPathfindingService {
-  config: ConfiguredMapType;
+  map: MapConfigType;
   unit: UnitType;
   currentCoordinates: Coordinates;
   processedTiles: TerrainWithKey[] = [];
@@ -53,21 +54,16 @@ export default class UnitPathfindingService {
 
   constructor({
     unitCoordinates,
-    config
+    map
   }: {
     unitCoordinates: UnitCoordinates;
-    config: ConfiguredMapType;
+    map: MapConfigType;
   }) {
-    const _unitCoordinates = config.units.find(
-      ({ unit }) => unit.name === unitCoordinates.unit.name
-    );
-    if (!_unitCoordinates) {
-      return;
-    }
-    const { coordinates, unit } = _unitCoordinates;
-    this.currentCoordinates = coordinates;
+    this.currentCoordinates = unitCoordinates.coordinates;
+    this.unit = unitCoordinates.unit;
+    this.map = map;
 
-    config.map.terrain.forEach((row, y) => {
+    map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
         const tile = this.getTile({ x, y });
@@ -193,15 +189,14 @@ export default class UnitPathfindingService {
     );
 
   private isWithinBounds = ({ x, y }: Coordinates) => {
-    const { width, height } = this.config.map.size;
+    const { width, height } = getMapSize(this.map);
     const outOfBoundsX = x < 0 || x > width;
     const outOfBoundsY = y < 0 || y > height;
     return !(outOfBoundsX || outOfBoundsY);
   };
 
   private getTile({ x, y }: Coordinates): TerrainWithKey {
-    const { map } = this.config;
-    const row = map.terrain[y];
+    const row = this.map.terrain[y];
     if (!row) {
       return null;
     }

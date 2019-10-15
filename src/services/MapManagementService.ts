@@ -5,38 +5,24 @@ import { TerrainCreatorType } from "../types";
 
 export type MapConfigType = { terrain: TerrainCreatorType[][] };
 
-export type ConfiguredMapType = {
-  map: MapConfigType & {
-    size: { width: number; height: number };
-  };
-  units: UnitCoordinates[];
-};
-
 export interface MapManagementServiceConstructor {
   map: MapConfigType;
   units: UnitCoordinates[];
 }
 
 export default class MapManagementService {
-  config: ConfiguredMapType;
+  map: MapConfigType;
+  units: UnitCoordinates[];
   pathfinders: { [key: string]: UnitPathfindingService };
   pauseInteractions = false;
 
   constructor({ map, units }: MapManagementServiceConstructor) {
-    this.config = {
-      map: {
-        ...map,
-        size: {
-          height: map.terrain.length - 1,
-          width: map.terrain[0].length - 1
-        }
-      },
-      units
-    };
+    this.map = map;
+    this.units = units;
     this.pathfinders = units.reduce(
       (acc, unitCoordinates) => {
         const pathfinder = new UnitPathfindingService({
-          config: this.config,
+          map: this.map,
           unitCoordinates
         });
         acc[unitCoordinates.unit.name] = pathfinder;
@@ -44,5 +30,16 @@ export default class MapManagementService {
       },
       {} as { [key: string]: UnitPathfindingService }
     );
+  }
+
+  addUnits(units: UnitCoordinates[]) {
+    units.forEach(unitCoordinates => {
+      const pathfinder = new UnitPathfindingService({
+        map: this.map,
+        unitCoordinates
+      });
+      this.pathfinders[unitCoordinates.unit.name] = pathfinder;
+    });
+    return this;
   }
 }

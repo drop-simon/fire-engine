@@ -1,4 +1,5 @@
 import { StatListType, StatGrowthRateListType } from "../types";
+import { MapConfigType } from "./MapManagementService";
 
 // probability is a float between 0 and 1
 export const getProbabilityResult = (probability: number) =>
@@ -20,4 +21,11 @@ export const increaseStats = ({
     }
   }
   return nextStats;
+};
+
+export const getMapSize = function(map: MapConfigType) {
+  const width = map.terrain[0].length - 1;
+  const height = map.terrain.length - 1;
+
+  return { width, height };
 };
