@@ -1,55 +1,50 @@
-import MapManagementService, {
-  MapManagementServiceConstructor
-} from "./MapManagementService";
+import { UnitAllegianceType, UnitBehaviorType } from "../types";
+import MapManagementService, { MapConfigType } from "./MapManagementService";
 import { ChapterGoalType } from "./ChapterCreationService";
 import { Coordinates, UnitCoordinates } from "./UnitPathfindingService";
 
-interface BattleManagementServiceConstructor
-  extends MapManagementServiceConstructor {
+interface BattleManagementServiceConstructor {
+  map: MapConfigType;
   goal: ChapterGoalType;
-  possibleStartCoordinates: Coordinates[];
+  enemyUnits: UnitCoordinates[];
+  playerUnits: UnitCoordinates[];
+  neutralUnits?: UnitCoordinates[];
 }
 
 export default class BattleManagementService {
   goal: ChapterGoalType;
-  possibleStartCoordinates: Coordinates[];
-
   mapManager: MapManagementService;
-  unitStartCoordinates: UnitCoordinates[] = [];
+  enemyUnits: UnitCoordinates[] = [];
+  playerUnits: UnitCoordinates[] = [];
+  neutralUnits: UnitCoordinates[] = [];
   numTurns = 0;
-  turn: "player" | "computer";
+  turn: UnitAllegianceType;
 
   constructor({
     goal,
-    possibleStartCoordinates,
     map,
-    units
+    enemyUnits,
+    playerUnits,
+    neutralUnits = []
   }: BattleManagementServiceConstructor) {
     this.goal = goal;
-    this.possibleStartCoordinates = possibleStartCoordinates;
-    this.mapManager = new MapManagementService({ map, units });
-  }
-
-  setUnitStartCoords({ unit, coordinates }: UnitCoordinates) {
-    const isValidStartingPosition = this.possibleStartCoordinates.some(
-      ({ x, y }) => x === coordinates.x && y === coordinates.y
-    );
-    if (isValidStartingPosition) {
-      this.unitStartCoordinates = this.unitStartCoordinates
-        .filter(
-          ({ coordinates: { x, y } }) =>
-            x === coordinates.x && y === coordinates.y
-        )
-        .concat({ unit, coordinates });
-    }
-    return this;
-  }
-
-  start() {
-    this.mapManager.addUnits(this.unitStartCoordinates);
+    this.mapManager = new MapManagementService({ map, units: enemyUnits });
+    this.playerUnits = playerUnits;
+    this.enemyUnits = enemyUnits;
+    this.neutralUnits = neutralUnits;
   }
 
   private endTurn() {}
 
   private processEnemyTurn() {}
+
+  private addUnit({
+    unit,
+    coordinates,
+    allegiance,
+    behavior
+  }: UnitCoordinates & {
+    behavior: UnitBehaviorType;
+    allegiance: UnitAllegianceType;
+  }) {}
 }

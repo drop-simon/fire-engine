@@ -14,7 +14,6 @@ export default class MapManagementService {
   map: MapConfigType;
   units: UnitCoordinates[];
   pathfinders: { [key: string]: UnitPathfindingService };
-  pauseInteractions = false;
 
   constructor({ map, units }: MapManagementServiceConstructor) {
     this.map = map;

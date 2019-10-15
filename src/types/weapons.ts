@@ -42,9 +42,10 @@ export interface WeaponConfigType<C extends CombatCategoryType> {
   maxUses: number;
   numUses: number;
   experience: number;
-  range: [number, number];
+  range: [number, number]; // min-max range, eg. [3,10] | [1,1]
   cost?: number;
 }
+
 export type PhysicalWeaponConfigType = WeaponConfigType<"Physical">;
 export type MagicWeaponConfigType = WeaponConfigType<"Magic">;
 export type SpecialWeaponConfigType = WeaponConfigType<"Special">;

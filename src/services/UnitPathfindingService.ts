@@ -159,6 +159,13 @@ export default class UnitPathfindingService {
     return uniqBy(walkableTiles, "key");
   }
 
+  getAdjacentTiles = (coordinates: Coordinates) =>
+    compact(
+      ADJACENT_TILE_INDICES.map(({ x, y }) =>
+        this.getTile({ x: coordinates.x + x, y: coordinates.y + y })
+      )
+    );
+
   private getFullMovementRange() {
     const { movement } = this.unit.stats;
     const { currentCoordinates } = this;
@@ -180,13 +187,6 @@ export default class UnitPathfindingService {
     );
     return uniqBy(coordinates, this.createTileKey);
   }
-
-  private getAdjacentTiles = (coordinates: Coordinates) =>
-    compact(
-      ADJACENT_TILE_INDICES.map(({ x, y }) =>
-        this.getTile({ x: coordinates.x + x, y: coordinates.y + y })
-      )
-    );
 
   private isWithinBounds = ({ x, y }: Coordinates) => {
     const { width, height } = getMapSize(this.map);

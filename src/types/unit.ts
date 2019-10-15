@@ -185,3 +185,12 @@ export type UnitNameType = keyof typeof UNITS;
 export type ManagedUnitType = UnitManagementService;
 
 export type UnitDependantFunctionType<T extends any> = (unit: UnitType) => T;
+
+export type UnitAllegianceType = "PLAYER" | "ENEMY" | "NEUTRAL";
+
+export type UnitBehaviorType =
+  | "STATIONARY"
+  | "PASSIVE"
+  | "ACTIVE"
+  | "SUPPORT"
+  | "THIEF";
