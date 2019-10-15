@@ -82,7 +82,12 @@ export default class UnitBehaviorService {
 
   handlePassiveBehavior() {}
 
-  handleActiveBehavior() {}
+  handleActiveBehavior() {
+    const pathToNearestHostileUnit = this.getPathToNearestHostileUnit();
+    if (!pathToNearestHostileUnit) {
+      return;
+    }
+  }
 
   handleSupportBehavior() {}
 
