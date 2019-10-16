@@ -39,7 +39,7 @@ export type PhysicalUnitType =
   | "Sniper"
   | "Soldier"
   | "Swordmaster"
-  | "Theif"
+  | "Thief"
   | "Recruit"
   | "Warrior"
   | "Wyvern Knight"

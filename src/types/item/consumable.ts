@@ -3,7 +3,7 @@ import { ItemBaseConfig } from "./item";
 import BattleManagementService from "../../services/BattleManagementService";
 
 export type ConsumableItemConfig = ItemBaseConfig & {
-  effect: {
+  effect?: {
     static?: Partial<StatListType>;
     permanent?: Partial<StatListType>;
     ongoing?: {

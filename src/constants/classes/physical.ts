@@ -162,7 +162,7 @@ export const Pirate: PhysicalUnitClassConfigType = {
 };
 
 export const Cavalier: PhysicalUnitClassConfigType = {
-  name: "Theif",
+  name: "Thief",
   category: "Physical",
   flying: false,
   horseback: true,
@@ -322,8 +322,8 @@ export const WyvernRider: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Theif: PhysicalUnitClassConfigType = {
-  name: "Theif",
+export const Thief: PhysicalUnitClassConfigType = {
+  name: "Thief",
   category: "Physical",
   flying: false,
   horseback: false,

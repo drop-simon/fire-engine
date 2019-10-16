@@ -7,6 +7,7 @@ export interface ItemBaseConfig {
   category: "Weapon" | "Consumable" | "Promotional" | "Other";
   maxUses: number;
   numUses: number;
+  cost: number;
 }
 export type ItemType =
   | WeaponConfigType<CombatCategoryType>

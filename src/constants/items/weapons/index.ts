@@ -1,1 +1,1 @@
-export * from "./axes";
+export { default as Axes } from "./axes";

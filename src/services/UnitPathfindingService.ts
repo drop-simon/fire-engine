@@ -216,7 +216,7 @@ export default class UnitPathfindingService {
     };
   }
 
-  private createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
+  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 
   private createDijkstraNode = (coordinates: Coordinates) => {
     const tile = this.getTile(coordinates);

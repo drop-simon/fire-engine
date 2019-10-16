@@ -10,7 +10,8 @@ export const Vulnerary: ConsumableItemConfig = {
   category: "Consumable",
   effect: { static: { health: 10 } },
   getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false
+  getIsUseableInOverworld: () => false,
+  cost: 300
 };
 
 export const Elixir: ConsumableItemConfig = {
@@ -20,7 +21,8 @@ export const Elixir: ConsumableItemConfig = {
   category: "Consumable",
   effect: { static: { health: 60 } },
   getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false
+  getIsUseableInOverworld: () => false,
+  cost: 3000
 };
 
 export const Antitoxin: ConsumableItemConfig = {
@@ -30,7 +32,8 @@ export const Antitoxin: ConsumableItemConfig = {
   category: "Consumable",
   effect: { curesPoison: true },
   getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false
+  getIsUseableInOverworld: () => false,
+  cost: 450
 };
 
 export const PureWater: ConsumableItemConfig = {
@@ -40,7 +43,8 @@ export const PureWater: ConsumableItemConfig = {
   category: "Consumable",
   effect: { ongoing: { resistance: { amount: 2, numTurns: 3 } } },
   getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false
+  getIsUseableInOverworld: () => false,
+  cost: 900
 };
 
 export const Speedwing: ConsumableItemConfig = {
@@ -50,7 +54,8 @@ export const Speedwing: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { speed: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "speed"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "speed")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "speed"),
+  cost: 8000
 };
 
 export const SkillTome: ConsumableItemConfig = {
@@ -60,7 +65,8 @@ export const SkillTome: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { skill: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "skill"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "skill")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "skill"),
+  cost: 8000
 };
 
 export const EnergyRing: ConsumableItemConfig = {
@@ -70,7 +76,8 @@ export const EnergyRing: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { power: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "power"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "power")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "power"),
+  cost: 8000
 };
 
 export const DragonShield: ConsumableItemConfig = {
@@ -80,7 +87,8 @@ export const DragonShield: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { defense: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "defense"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "defense")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "defense"),
+  cost: 8000
 };
 
 export const Talisman: ConsumableItemConfig = {
@@ -91,7 +99,8 @@ export const Talisman: ConsumableItemConfig = {
   effect: { permanent: { resistance: 2 } },
   getIsUseableInBattle: ({ unit }) =>
     getCanIncreaseUnitStat(unit, "resistance"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "resistance")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "resistance"),
+  cost: 8000
 };
 
 export const AngelicRobe: ConsumableItemConfig = {
@@ -101,7 +110,8 @@ export const AngelicRobe: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { health: 7 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "health"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "health")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "health"),
+  cost: 8000
 };
 
 export const GoddessIcon: ConsumableItemConfig = {
@@ -111,7 +121,8 @@ export const GoddessIcon: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { luck: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "luck"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "luck")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "luck"),
+  cost: 8000
 };
 
 export const BodyRing: ConsumableItemConfig = {
@@ -122,7 +133,8 @@ export const BodyRing: ConsumableItemConfig = {
   effect: { permanent: { constitution: 2 } },
   getIsUseableInBattle: ({ unit }) =>
     getCanIncreaseUnitStat(unit, "constitution"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "constitution")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "constitution"),
+  cost: 8000
 };
 
 export const Swiftsoles: ConsumableItemConfig = {
@@ -132,5 +144,124 @@ export const Swiftsoles: ConsumableItemConfig = {
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
   getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "movement"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "movement")
+  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "movement"),
+  cost: 8000
+};
+
+export const ChestKey: ConsumableItemConfig = {
+  name: "Chest Key",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: { permanent: { movement: 2 } },
+  getIsUseableInBattle: ({ unit, battleManager }) => {
+    const pathfinder = battleManager.mapManager.pathfinders[unit.name];
+    if (unit.items.length > 4 || !pathfinder) {
+      return false;
+    }
+
+    const { currentCoordinates, createTileKey } = pathfinder;
+
+    return battleManager.chests.some(
+      ({ coordinates, isOpened }) =>
+        !isOpened &&
+        createTileKey(coordinates) === createTileKey(currentCoordinates)
+    );
+  },
+  getIsUseableInOverworld: () => false,
+  cost: 300
+};
+
+export const DoorKey: ConsumableItemConfig = {
+  name: "Door Key",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: { permanent: { movement: 2 } },
+  getIsUseableInBattle: ({ unit, battleManager }) => {
+    const pathfinder = battleManager.mapManager.pathfinders[unit.name];
+    if (!pathfinder) {
+      return false;
+    }
+    const { currentCoordinates, getAdjacentTiles } = pathfinder;
+    return getAdjacentTiles(currentCoordinates).some(
+      tile => tile.name === "door"
+    );
+  },
+  getIsUseableInOverworld: () => false,
+  cost: 50
+};
+
+export const Lockpick: ConsumableItemConfig = {
+  name: "Lockpick",
+  numUses: 15,
+  maxUses: 15,
+  category: "Consumable",
+  effect: { permanent: { movement: 2 } },
+  getIsUseableInBattle: ({ unit, battleManager }) => {
+    if (unit.base.name !== "Thief") {
+      return false;
+    }
+    return (
+      DoorKey.getIsUseableInBattle({ unit, battleManager }) ||
+      ChestKey.getIsUseableInBattle({ unit, battleManager })
+    );
+  },
+  getIsUseableInOverworld: () => false,
+  cost: 1200
+};
+
+export const RedGem: ConsumableItemConfig = {
+  name: "Red Gem",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: undefined,
+  getIsUseableInBattle: () => false,
+  getIsUseableInOverworld: () => false,
+  cost: 5000
+};
+
+export const BlueGem: ConsumableItemConfig = {
+  name: "Blue Gem",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: undefined,
+  getIsUseableInBattle: () => false,
+  getIsUseableInOverworld: () => false,
+  cost: 10000
+};
+
+export const WhiteGem: ConsumableItemConfig = {
+  name: "White Gem",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: undefined,
+  getIsUseableInBattle: () => false,
+  getIsUseableInOverworld: () => false,
+  cost: 20000
+};
+
+export const BlackGem: ConsumableItemConfig = {
+  name: "Black Gem",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: undefined,
+  getIsUseableInBattle: () => false,
+  getIsUseableInOverworld: () => false,
+  cost: 30000
+};
+
+export const GoldGem: ConsumableItemConfig = {
+  name: "Black Gem",
+  numUses: 1,
+  maxUses: 1,
+  category: "Consumable",
+  effect: undefined,
+  getIsUseableInBattle: () => false,
+  getIsUseableInOverworld: () => false,
+  cost: 40000
 };

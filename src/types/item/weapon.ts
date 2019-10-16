@@ -53,7 +53,6 @@ export interface WeaponConfigType<C extends CombatCategoryType>
   critical: number;
   experience: number;
   range: [number, number]; // min-max range, eg. [3,10] | [1,1]
-  cost?: number;
 }
 
 export type PhysicalWeaponConfigType = WeaponConfigType<"Physical">;

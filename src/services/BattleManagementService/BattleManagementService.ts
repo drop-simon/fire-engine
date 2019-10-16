@@ -19,6 +19,7 @@ export default class BattleManagementService {
   enemyUnits: UnitCoordinates[] = [];
   playerUnits: UnitCoordinates[] = [];
   neutralUnits: UnitCoordinates[] = [];
+  chests: { coordinates: Coordinates; isOpened?: false }[] = [];
   numTurns = 0;
   turn: UnitAllegianceType;
   actionQueue: any[] = [];

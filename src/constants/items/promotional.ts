@@ -16,7 +16,7 @@ const {
   Nomad,
   PegasusKnight,
   Pirate,
-  Theif,
+  Thief,
   WyvernRider
 } = PhysicalClasses;
 
@@ -25,6 +25,7 @@ export const GuidingRing: PromotionalItemConfig<"Magic"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [Mage, Cleric, Monk, Shaman]
 };
 
@@ -33,6 +34,7 @@ export const HeroCrest: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [Mercenary, Myrmidon, Fighter]
 };
 
@@ -41,7 +43,8 @@ export const OceanSeal: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
-  applicableUnits: [Pirate, Theif]
+  cost: 10000,
+  applicableUnits: [Pirate, Thief]
 };
 
 export const FellContract: PromotionalItemConfig<"Physical"> = {
@@ -49,7 +52,8 @@ export const FellContract: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
-  applicableUnits: [Theif]
+  cost: 10000,
+  applicableUnits: [Thief]
 };
 
 export const KnightCrest: PromotionalItemConfig<"Physical"> = {
@@ -57,6 +61,7 @@ export const KnightCrest: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [Knight, Cavalier]
 };
 
@@ -65,6 +70,7 @@ export const OrionsBolt: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [Archer, Nomad]
 };
 
@@ -73,6 +79,7 @@ export const ElysianWhip: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [PegasusKnight, WyvernRider]
 };
 
@@ -81,5 +88,6 @@ export const HeavenSeal: PromotionalItemConfig<"Physical"> = {
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
+  cost: 10000,
   applicableUnits: [Lord, Lady]
 };
