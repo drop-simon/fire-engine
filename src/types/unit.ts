@@ -9,7 +9,6 @@ import {
   BloodType
 } from ".";
 import { ItemType, CombatCategoryType, WeaponSpecialtyType } from ".";
-import UNITS from "../constants/units";
 import UnitCreationService from "../services/UnitCreationService";
 import UnitManagementService from "../services/UnitManagementService";
 
@@ -174,8 +173,6 @@ export type AnyUnitType = UnitConfigType<CombatCategoryType>;
 export type UnitType = ReturnType<
   UnitCreationService<CombatCategoryType>["process"]
 >;
-
-export type UnitNameType = keyof typeof UNITS;
 
 export type ManagedUnitType = UnitManagementService;
 

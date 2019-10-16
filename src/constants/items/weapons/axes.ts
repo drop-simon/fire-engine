@@ -1,6 +1,6 @@
-import { PhysicalWeaponConfigType } from "../../types";
+import { PhysicalWeaponConfigType } from "../../../types";
 
-const IronAxe: PhysicalWeaponConfigType = {
+export const IronAxe: PhysicalWeaponConfigType = {
   name: "Iron Axe",
   category: "Weapon",
   subcategory: "Physical",
@@ -17,7 +17,7 @@ const IronAxe: PhysicalWeaponConfigType = {
   cost: 270
 };
 
-const SteelAxe: PhysicalWeaponConfigType = {
+export const SteelAxe: PhysicalWeaponConfigType = {
   name: "Steel Axe",
   category: "Weapon",
   subcategory: "Physical",
@@ -34,7 +34,7 @@ const SteelAxe: PhysicalWeaponConfigType = {
   cost: 1000
 };
 
-const SilverAxe: PhysicalWeaponConfigType = {
+export const SilverAxe: PhysicalWeaponConfigType = {
   name: "Silver Axe",
   category: "Weapon",
   subcategory: "Physical",
@@ -51,10 +51,8 @@ const SilverAxe: PhysicalWeaponConfigType = {
   cost: 1000
 };
 
-const Axes = {
+export const Axes = {
   IronAxe,
   SteelAxe,
   SilverAxe
 };
-
-export default Axes;

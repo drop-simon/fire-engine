@@ -92,6 +92,29 @@ export const Mercenary: PhysicalUnitClassConfigType = {
   }
 };
 
+export const Hero: PhysicalUnitClassConfigType = {
+  name: "Hero",
+  category: "Physical",
+  flying: false,
+  horseback: false,
+  armored: false,
+  weapons: ["Swords", "Axes"],
+  promotions: [],
+  baseMovement: 6,
+  ability: null,
+  maxStats: {
+    health: 60,
+    power: 25,
+    defense: 24,
+    resistance: 23,
+    speed: 26,
+    luck: 30,
+    skill: 30,
+    constitution: 20,
+    movement: 15
+  }
+};
+
 export const Knight: PhysicalUnitClassConfigType = {
   name: "Knight",
   category: "Physical",
@@ -363,6 +386,75 @@ export const Rogue: PhysicalUnitClassConfigType = {
     speed: 20,
     luck: 30,
     skill: 20,
+    constitution: 20,
+    movement: 15
+  }
+};
+
+export const Warrior: PhysicalUnitClassConfigType = {
+  name: "Warrior",
+  category: "Physical",
+  flying: false,
+  horseback: false,
+  armored: false,
+  weapons: ["Axes", "Bows"],
+  promotions: [],
+  baseMovement: 6,
+  ability: null,
+  maxStats: {
+    health: 60,
+    power: 30,
+    defense: 26,
+    resistance: 22,
+    speed: 26,
+    luck: 30,
+    skill: 28,
+    constitution: 20,
+    movement: 15
+  }
+};
+
+export const Nomad: PhysicalUnitClassConfigType = {
+  name: "Nomad",
+  category: "Physical",
+  flying: false,
+  horseback: true,
+  armored: false,
+  weapons: ["Bows"],
+  promotions: ["Nomadic Trooper"],
+  baseMovement: 7,
+  ability: null,
+  maxStats: {
+    health: 60,
+    power: 20,
+    defense: 20,
+    resistance: 20,
+    speed: 20,
+    luck: 30,
+    skill: 20,
+    constitution: 20,
+    movement: 15
+  }
+};
+
+export const NomadicTrooper: PhysicalUnitClassConfigType = {
+  name: "Nomadic Trooper",
+  category: "Physical",
+  flying: false,
+  horseback: true,
+  armored: false,
+  weapons: ["Bows", "Swords"],
+  promotions: [],
+  baseMovement: 8,
+  ability: null,
+  maxStats: {
+    health: 60,
+    power: 25,
+    defense: 24,
+    resistance: 23,
+    speed: 30,
+    luck: 30,
+    skill: 28,
     constitution: 20,
     movement: 15
   }

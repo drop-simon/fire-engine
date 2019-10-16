@@ -66,6 +66,28 @@ export const Shaman: MagicUnitClassConfigType = {
   }
 };
 
+export const Summoner: MagicUnitClassConfigType = {
+  name: "Summoner",
+  category: "Magic",
+  horseback: false,
+  flying: false,
+  armored: false,
+  weapons: ["Dark", "Staves"],
+  promotions: [],
+  baseMovement: 5,
+  maxStats: {
+    health: 60,
+    power: 27,
+    defense: 20,
+    resistance: 28,
+    speed: 26,
+    luck: 30,
+    skill: 27,
+    constitution: 20,
+    movement: 15
+  }
+};
+
 export const Monk: MagicUnitClassConfigType = {
   name: "Monk",
   category: "Magic",

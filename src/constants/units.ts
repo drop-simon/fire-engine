@@ -1,5 +1,5 @@
 import { Lord } from "./classes/physical";
-import { Weapons } from ".";
+import { Items } from ".";
 import UnitCreationService from "../services/UnitCreationService";
 
 export const Calypso = new UnitCreationService<"Physical">({
@@ -8,8 +8,8 @@ export const Calypso = new UnitCreationService<"Physical">({
   birthMonth: "September",
   bloodType: "A",
   sex: "F",
-  items: [Weapons.SilverAxe],
-  weaponLevels: [{ weapon: "Lances" as const, level: "A" as const }],
+  items: [Items.Weapons.Axes.SilverAxe],
+  weaponLevels: [{ specialty: "Lances", level: "A" }],
   supports: {},
   base: Lord
 }).process();
@@ -20,12 +20,8 @@ export const Artemis = new UnitCreationService<"Physical">({
   birthMonth: "June",
   bloodType: "AB",
   sex: "M",
-  items: [Weapons.SilverAxe],
-  weaponLevels: [{ weapon: "Axes", level: "A" }],
+  items: [Items.Weapons.Axes.SilverAxe],
+  weaponLevels: [{ specialty: "Axes", level: "A" }],
   supports: {},
   base: Lord
 }).process();
-
-const Units = { Calypso, Artemis };
-
-export default Units;

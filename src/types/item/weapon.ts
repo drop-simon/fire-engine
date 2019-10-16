@@ -1,5 +1,11 @@
 import { ItemBaseConfig } from "./item";
-import { Weapons, CombatCategories } from "../../constants";
+import { Items } from "../../constants";
+
+const CombatCategories = {
+  Physical: "Physical",
+  Magic: "Magic",
+  Special: "Special"
+} as const;
 
 export type PhysicalWeaponSpecialtyType = "Swords" | "Lances" | "Axes" | "Bows";
 
@@ -54,6 +60,6 @@ export type PhysicalWeaponConfigType = WeaponConfigType<"Physical">;
 export type MagicWeaponConfigType = WeaponConfigType<"Magic">;
 export type SpecialWeaponConfigType = WeaponConfigType<"Special">;
 
-export type WeaponNameType = keyof typeof Weapons;
+export type WeaponNameType = keyof typeof Items["Weapons"];
 
-export type WeaponType = typeof Weapons[WeaponNameType];
+export type WeaponType = typeof Items["Weapons"][WeaponNameType];
