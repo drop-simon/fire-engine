@@ -256,7 +256,7 @@ export const BlackGem: ConsumableItemConfig = {
 };
 
 export const GoldGem: ConsumableItemConfig = {
-  name: "Black Gem",
+  name: "Gold Gem",
   numUses: 1,
   maxUses: 1,
   category: "Consumable",
