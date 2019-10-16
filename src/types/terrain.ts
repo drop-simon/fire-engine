@@ -4,6 +4,7 @@ import { UnitDependantFunctionType } from ".";
 export type TerrainNameType = keyof typeof Terrain;
 
 export type TerrainCreatorType = UnitDependantFunctionType<{
+  name: string;
   movementCost: number;
   effects: {
     static: {

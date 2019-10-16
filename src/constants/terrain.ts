@@ -1,6 +1,7 @@
 import { TerrainCreatorType } from "../types/terrain";
 
-const Void: TerrainCreatorType = () => ({
+const createVoidLikeTileCreator = (name: string): TerrainCreatorType => () => ({
+  name,
   movementCost: Infinity,
   effects: {
     static: {
@@ -12,13 +13,16 @@ const Void: TerrainCreatorType = () => ({
     }
   }
 });
-const VOID_LIKE_TILES = {
-  Void,
-  Wall: Void,
-  ["BuildingSpace"]: Void
+const VOID_LIKE_TERRAIN_CREATORS = {
+  Void: createVoidLikeTileCreator("void"),
+  Wall: createVoidLikeTileCreator("wall"),
+  BuildingSpace: createVoidLikeTileCreator("building space")
 } as const;
 
-const Gap: TerrainCreatorType = ({ base: { flying } }) => ({
+const createGapLikeTileCreator = (name: string): TerrainCreatorType => ({
+  base: { flying }
+}) => ({
+  name,
   movementCost: flying ? 1 : Infinity,
   effects: {
     static: {
@@ -30,15 +34,18 @@ const Gap: TerrainCreatorType = ({ base: { flying } }) => ({
     }
   }
 });
-const GAP_LIKE_TILES = {
-  Gap,
-  Thicket: Gap,
-  Cliff: Gap,
-  Fence: Gap,
-  Snag: Gap
+const GAP_LIKE_TERRAIN_CREATORS = {
+  Gap: createGapLikeTileCreator("gap"),
+  Thicket: createGapLikeTileCreator("thicket"),
+  Cliff: createGapLikeTileCreator("cliff"),
+  Fence: createGapLikeTileCreator("fence"),
+  Snag: createGapLikeTileCreator("snag")
 };
 
-const Floor: TerrainCreatorType = () => ({
+const createFloorLikeTileCreator = (
+  name: string
+): TerrainCreatorType => () => ({
+  name,
   movementCost: 1,
   effects: {
     static: {
@@ -50,14 +57,17 @@ const Floor: TerrainCreatorType = () => ({
     }
   }
 });
-const FLOOR_LIKE_TILES = {
-  Floor,
-  Plain: Floor,
-  Chest: Floor,
-  Bridge: Floor
+const FLOOR_LIKE_TERRAIN_CREATORS = {
+  Floor: createFloorLikeTileCreator("floor"),
+  Plain: createFloorLikeTileCreator("plains"),
+  Chest: createFloorLikeTileCreator("chest"),
+  Bridge: createFloorLikeTileCreator("bridge")
 } as const;
 
-const Village: TerrainCreatorType = () => ({
+const createVillageLikeTileCreator = (
+  name: string
+): TerrainCreatorType => () => ({
+  name,
   movementCost: 1,
   effects: {
     static: {
@@ -69,15 +79,16 @@ const Village: TerrainCreatorType = () => ({
     }
   }
 });
-const VILLAGE_LIKE_TILES = {
-  Village,
-  Armory: Village,
-  Vendor: Village,
-  Arena: Village,
-  Stairs: Village
+const VILLAGE_LIKE_TERRAIN_CREATORS = {
+  Village: createVillageLikeTileCreator("village"),
+  Armory: createVillageLikeTileCreator("armory"),
+  Vendor: createVillageLikeTileCreator("vendor"),
+  Arena: createVillageLikeTileCreator("arena"),
+  Stairs: createVillageLikeTileCreator("stairs")
 } as const;
 
 const Ballista: TerrainCreatorType = ({ base: { flying } }) => ({
+  name: "ballista",
   movementCost: flying ? 1 : 2,
   effects: {
     static: {
@@ -90,39 +101,37 @@ const Ballista: TerrainCreatorType = ({ base: { flying } }) => ({
   }
 });
 
-const Forest: TerrainCreatorType = ({ base: { horseback, flying } }) => {
-  return {
-    flyable: true,
-    movementCost: flying ? 1 : horseback ? 3 : 2,
-    effects: {
-      static: {
-        defense: 1,
-        avoid: 20
-      },
-      ongoing: {
-        health: 0
-      }
+const Forest: TerrainCreatorType = ({ base: { horseback, flying } }) => ({
+  name: "forest",
+  flyable: true,
+  movementCost: flying ? 1 : horseback ? 3 : 2,
+  effects: {
+    static: {
+      defense: 1,
+      avoid: 20
+    },
+    ongoing: {
+      health: 0
     }
-  };
-};
+  }
+});
 
 const Pillar: TerrainCreatorType = ({
   base: { horseback, flying, armored }
-}) => {
-  return {
-    flyable: true,
-    movementCost: flying ? 1 : horseback || armored ? 3 : 2,
-    effects: {
-      static: {
-        defense: 1,
-        avoid: 20
-      },
-      ongoing: {
-        health: 0
-      }
+}) => ({
+  name: "pillar",
+  flyable: true,
+  movementCost: flying ? 1 : horseback || armored ? 3 : 2,
+  effects: {
+    static: {
+      defense: 1,
+      avoid: 20
+    },
+    ongoing: {
+      health: 0
     }
-  };
-};
+  }
+});
 
 const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
   "Fighter",
@@ -131,6 +140,7 @@ const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
   "Pirate"
 ];
 const Mountain: TerrainCreatorType = ({ base: { flying } }) => ({
+  name: "mountain",
   flyable: true,
   movementCost: !MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
     ? Infinity
@@ -139,8 +149,8 @@ const Mountain: TerrainCreatorType = ({ base: { flying } }) => ({
     : 4,
   effects: {
     static: {
-      defense: flying ? 0 : 2,
-      avoid: flying ? 0 : 30
+      defense: 2,
+      avoid: 30
     },
     ongoing: {
       health: 0
@@ -149,6 +159,7 @@ const Mountain: TerrainCreatorType = ({ base: { flying } }) => ({
 });
 
 const Peak: TerrainCreatorType = ({ base: { flying } }) => ({
+  name: "peak",
   movementCost: !MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
     ? Infinity
     : flying
@@ -156,8 +167,8 @@ const Peak: TerrainCreatorType = ({ base: { flying } }) => ({
     : 4,
   effects: {
     static: {
-      defense: flying ? 0 : 2,
-      avoid: flying ? 0 : 40
+      defense: 2,
+      avoid: 40
     },
     ongoing: {
       health: 0
@@ -166,6 +177,7 @@ const Peak: TerrainCreatorType = ({ base: { flying } }) => ({
 });
 
 const Gate: TerrainCreatorType = ({ stats }) => ({
+  name: "gate",
   movementCost: 1,
   effects: {
     static: {
@@ -179,6 +191,7 @@ const Gate: TerrainCreatorType = ({ stats }) => ({
 });
 
 const Throne: TerrainCreatorType = ({ stats }) => ({
+  name: "throne",
   movementCost: 1,
   effects: {
     static: {
@@ -193,6 +206,7 @@ const Throne: TerrainCreatorType = ({ stats }) => ({
 
 const WATER_TRAVERSABLE_UNITS: string[] = ["Berserker", "Pirate"];
 const Sea: TerrainCreatorType = ({ base: { name, flying } }) => ({
+  name: "sea",
   movementCost: !WATER_TRAVERSABLE_UNITS.includes(name)
     ? Infinity
     : flying
@@ -210,6 +224,7 @@ const Sea: TerrainCreatorType = ({ base: { name, flying } }) => ({
 });
 
 const Lake: TerrainCreatorType = ({ base: { name, flying } }) => ({
+  name: "lake",
   movementCost: !WATER_TRAVERSABLE_UNITS.includes(name)
     ? Infinity
     : flying
@@ -227,6 +242,7 @@ const Lake: TerrainCreatorType = ({ base: { name, flying } }) => ({
 });
 
 const Fort: TerrainCreatorType = ({ base: { name, flying } }) => ({
+  name: "fort",
   movementCost: flying ? 1 : 2,
   effects: {
     static: {
@@ -240,6 +256,7 @@ const Fort: TerrainCreatorType = ({ base: { name, flying } }) => ({
 });
 
 const Desert: TerrainCreatorType = ({ base: { horseback, category } }) => ({
+  name: "desert",
   movementCost: horseback ? 4 : category === "Magic" ? 1 : 2,
   effects: {
     static: {
@@ -255,6 +272,7 @@ const Desert: TerrainCreatorType = ({ base: { horseback, category } }) => ({
 const River: TerrainCreatorType = ({
   base: { promotions, name, horseback }
 }) => ({
+  name: "river",
   movementCost:
     name === "Pirate"
       ? 2
@@ -273,6 +291,7 @@ const River: TerrainCreatorType = ({
 });
 
 const Cliff: TerrainCreatorType = ({ base: { flying } }) => ({
+  name: "cliff",
   movementCost: flying ? 1 : Infinity,
   effects: {
     static: {
@@ -286,6 +305,7 @@ const Cliff: TerrainCreatorType = ({ base: { flying } }) => ({
 });
 
 const Ruins: TerrainCreatorType = ({ base: { flying } }) => ({
+  name: "ruins",
   movementCost: flying ? 1 : 2,
   effects: {
     static: {
@@ -299,6 +319,7 @@ const Ruins: TerrainCreatorType = ({ base: { flying } }) => ({
 });
 
 const Sand: TerrainCreatorType = () => ({
+  name: "sand",
   movementCost: 1,
   effects: {
     static: {
@@ -312,10 +333,10 @@ const Sand: TerrainCreatorType = () => ({
 });
 
 export const Terrain = {
-  ...VOID_LIKE_TILES,
-  ...GAP_LIKE_TILES,
-  ...FLOOR_LIKE_TILES,
-  ...VILLAGE_LIKE_TILES,
+  ...VOID_LIKE_TERRAIN_CREATORS,
+  ...GAP_LIKE_TERRAIN_CREATORS,
+  ...FLOOR_LIKE_TERRAIN_CREATORS,
+  ...VILLAGE_LIKE_TERRAIN_CREATORS,
   Ballista,
   Lake,
   River,
@@ -329,8 +350,6 @@ export const Terrain = {
   Throne,
   Sea,
   Desert,
-  Void,
-  Gap,
   Cliff,
   Sand
 } as const;

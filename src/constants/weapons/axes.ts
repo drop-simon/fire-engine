@@ -2,8 +2,9 @@ import { PhysicalWeaponConfigType } from "../../types";
 
 const IronAxe: PhysicalWeaponConfigType = {
   name: "Iron Axe",
-  category: "Physical",
-  type: "Axes",
+  category: "Weapon",
+  subcategory: "Physical",
+  specialty: "Axes",
   level: "E",
   maxUses: 45,
   numUses: 45,
@@ -18,8 +19,9 @@ const IronAxe: PhysicalWeaponConfigType = {
 
 const SteelAxe: PhysicalWeaponConfigType = {
   name: "Steel Axe",
-  category: "Physical",
-  type: "Axes",
+  category: "Weapon",
+  subcategory: "Physical",
+  specialty: "Axes",
   level: "A",
   maxUses: 20,
   numUses: 20,
@@ -34,8 +36,9 @@ const SteelAxe: PhysicalWeaponConfigType = {
 
 const SilverAxe: PhysicalWeaponConfigType = {
   name: "Silver Axe",
-  category: "Physical",
-  type: "Axes",
+  category: "Weapon",
+  subcategory: "Physical",
+  specialty: "Axes",
   level: "A",
   maxUses: 20,
   numUses: 20,

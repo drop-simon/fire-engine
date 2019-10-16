@@ -1,18 +1,17 @@
 import {
-  PhysicalWeaponType,
-  MagicWeaponType,
-  SpecialWeaponType,
+  PhysicalWeaponSpecialtyType,
+  MagicWeaponSpecialtyType,
+  SpecialWeaponSpecialtyType,
   WeaponLevelType,
   SupportDialogueType,
   SupportLevelType,
   BirthMonthType,
   BloodType
 } from ".";
-import { ItemType } from "./item";
+import { ItemType, CombatCategoryType, WeaponSpecialtyType } from ".";
 import UNITS from "../constants/units";
 import UnitCreationService from "../services/UnitCreationService";
 import UnitManagementService from "../services/UnitManagementService";
-import { CombatCategoryType } from "./weapons";
 
 export type PhysicalUnitType =
   | "Archer"
@@ -87,17 +86,17 @@ interface BaseUnitClassConfigType {
 
 export interface MagicUnitClassConfigType extends BaseUnitClassConfigType {
   category: "Magic";
-  weapons: MagicWeaponType[];
+  weapons: MagicWeaponSpecialtyType[];
 }
 
 export interface PhysicalUnitClassConfigType extends BaseUnitClassConfigType {
   category: "Physical";
-  weapons: PhysicalWeaponType[];
+  weapons: PhysicalWeaponSpecialtyType[];
 }
 
 export interface SpecialUnitClassConfigType extends BaseUnitClassConfigType {
   category: "Special";
-  weapons: SpecialWeaponType[];
+  weapons: SpecialWeaponSpecialtyType[];
 }
 
 export type AnyUnitClassConfigType =
@@ -165,11 +164,7 @@ export interface UnitConfigType<C extends CombatCategoryType> {
   supports: { [unitName: string]: SupportLevelType };
   items: ItemType[];
   weaponLevels: {
-    weapon: C extends "Physical"
-      ? PhysicalWeaponType
-      : C extends "Magic"
-      ? MagicWeaponType
-      : SpecialWeaponType;
+    specialty: WeaponSpecialtyType<C>;
     level: C extends SpecialUnitType ? null : WeaponLevelType;
   }[];
 }

@@ -3,15 +3,15 @@ import { UnitType } from "../types";
 const DialogueActions = {
   AddUnits: (units: UnitType[]) =>
     ({ type: "ADD_UNITS", payload: { units } } as const),
-  DismissUnits: (unitNames: string[]) =>
+  DismissUnits: (units: UnitType[]) =>
     ({
       type: "DISMISS_UNITS",
-      payload: { unitNames }
+      payload: { units }
     } as const),
-  OpenDialogue: (unitName: string, dialogue: string) =>
+  OpenDialogue: (unit: UnitType, dialogue: string) =>
     ({
       type: "OPEN_DIALOGUE",
-      payload: { unitName, dialogue }
+      payload: { unit, dialogue }
     } as const)
 };
 
@@ -31,28 +31,24 @@ export default class DialogueCreationService {
 
   addUnits(units: UnitType[]) {
     this.units.push(...units);
-
     const action = DialogueActions.AddUnits(units);
     this.dialogueQueue.push(action);
-
     return this;
   }
 
-  dismissUnits(unitNames: string[]) {
+  dismissUnits(units: UnitType[]) {
+    const unitNames = units.map(unit => unit.name);
     this.units = this.units.filter(unit => !unitNames.includes(unit.name));
 
-    const action = DialogueActions.DismissUnits(unitNames);
+    const action = DialogueActions.DismissUnits(units);
     this.dialogueQueue.push(action);
 
     return this;
   }
 
-  addDialogue({ unitName, dialogue }: { unitName: string; dialogue: string }) {
-    const unit = this.units.find(({ name }) => name === unitName);
-    if (unit) {
-      const action = DialogueActions.OpenDialogue(unitName, dialogue);
-      this.dialogueQueue.push(action);
-    }
+  openDialogue({ unit, dialogue }: { unit: UnitType; dialogue: string }) {
+    const action = DialogueActions.OpenDialogue(unit, dialogue);
+    this.dialogueQueue.push(action);
     return this;
   }
 }

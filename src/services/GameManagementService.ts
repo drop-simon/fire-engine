@@ -12,12 +12,19 @@ import { ConflictQueue } from "./ConflictProcessingService";
 type GameEventHandlers = {
   unitLevelUp: (args: {
     unit: UnitType;
-    prevStats: StatGrowthRateListType;
+    currentStats: StatGrowthRateListType;
     nextStats: StatGrowthRateListType;
   }) => any;
   // dialogue: (queue: DialogueQueue) => any;
   // conflict: (queue: ConflictQueue) => any;
   chapter: (queue: ChapterQueue) => any;
+};
+
+type GameSaveState = {
+  chapter: {
+    name: string;
+    queue: any[];
+  };
 };
 
 export default class GameManagementService extends EventEmitterService<

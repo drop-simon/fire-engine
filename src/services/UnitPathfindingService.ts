@@ -5,6 +5,7 @@ import uniqBy from "lodash/uniqBy";
 import { UnitType, TerrainType } from "../types";
 import { MapConfigType } from "./MapManagementService";
 import { getMapSize } from "./utils";
+import GameManagementService from "./GameManagementService";
 
 export type Coordinates = {
   x: number;
@@ -45,6 +46,7 @@ type GetPathTo = (args: {
 }) => TerrainWithKey[];
 
 export default class UnitPathfindingService {
+  gameManager: GameManagementService;
   map: MapConfigType;
   unit: UnitType;
   currentCoordinates: Coordinates;
@@ -53,12 +55,15 @@ export default class UnitPathfindingService {
   graph = new Graph();
 
   constructor({
+    gameManager,
     unitCoordinates,
     map
   }: {
+    gameManager: GameManagementService;
     unitCoordinates: UnitCoordinates;
     map: MapConfigType;
   }) {
+    this.gameManager = gameManager;
     this.currentCoordinates = unitCoordinates.coordinates;
     this.unit = unitCoordinates.unit;
     this.map = map;

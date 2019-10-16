@@ -4,7 +4,7 @@ import GameManagementService from "./GameManagementService";
 
 interface UnitManagementServiceConfigType {
   unit: UnitType;
-  gameManager: GameManagementService;
+  gameManager?: GameManagementService;
 }
 
 export default class UnitManagementService {
@@ -30,22 +30,20 @@ export default class UnitManagementService {
     this.unit.stats = nextStats;
     this.gameManager.emit("unitLevelUp", {
       unit: this.unit,
-      prevStats: currentStats,
+      currentStats,
       nextStats
     });
 
     return this;
   }
 
-  get equippedWeapon(): WeaponType | null {
-    const weapon = this.unit.items.find(item => {
-      const weaponCategories: CombatCategoryType[] = [
-        "Physical",
-        "Magic",
-        "Special"
-      ];
-      return weaponCategories.includes(item.category);
-    });
+  get equippedWeapon(): WeaponType | undefined {
+    const weapon = this.unit.items.find(item =>
+      this.unit.weaponLevels.some(
+        ({ specialty, level }) =>
+          specialty === item.specialty && level <= item.level
+      )
+    );
     return weapon as WeaponType | undefined;
   }
 
