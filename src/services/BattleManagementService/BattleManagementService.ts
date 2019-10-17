@@ -1,73 +1,48 @@
-import { UnitAllegianceType, UnitBehaviorType, UnitType } from "../../types";
+import { UnitAllegiance, UnitBehavior, Unit } from "../../types";
 import MapManagementService, { MapConfigType } from "../MapManagementService";
-import { ChapterGoalType } from "../ChapterCreationService";
-import { UnitCoordinates, Coordinates } from "../UnitPathfindingService";
+import { UnitCoordinates } from "./UnitPathfindingService";
 import GameManagementService from "../GameManagementService";
+import BattleUnitManagementService from "./BattleUnitManagementService";
+
+type BattleGoalType = {
+  description: string;
+  endCondition: (map: any) => boolean;
+  failCondition: (map: any) => boolean;
+};
 
 interface BattleManagementServiceConstructor {
-  map: MapConfigType;
-  goal: ChapterGoalType;
-  enemyUnits: UnitCoordinates[];
-  playerUnits: UnitCoordinates[];
-  neutralUnits?: UnitCoordinates[];
+  goal: BattleGoalType;
   gameManager: GameManagementService;
+  mapManager: MapManagementService;
 }
 
 export default class BattleManagementService {
-  goal: ChapterGoalType;
+  goal: BattleGoalType;
   mapManager: MapManagementService;
-  enemyUnits: UnitCoordinates[] = [];
-  playerUnits: UnitCoordinates[] = [];
-  neutralUnits: UnitCoordinates[] = [];
-  chests: { coordinates: Coordinates; isOpened?: false }[] = [];
+  gameManager: GameManagementService;
   numTurns = 0;
-  turn: UnitAllegianceType;
+  turn: UnitAllegiance;
   actionQueue: any[] = [];
 
   constructor({
     goal,
-    map,
-    enemyUnits,
-    playerUnits,
-    neutralUnits = [],
-    gameManager
+    gameManager,
+    mapManager
   }: BattleManagementServiceConstructor) {
     this.goal = goal;
-    this.mapManager = new MapManagementService({
-      map,
-      units: enemyUnits,
-      gameManager
-    });
-    this.playerUnits = playerUnits;
-    this.enemyUnits = enemyUnits;
-    this.neutralUnits = neutralUnits;
+    this.mapManager = mapManager;
+    this.gameManager = gameManager;
   }
 
   get units() {
-    return [...this.playerUnits, ...this.neutralUnits, ...this.enemyUnits];
-  }
-
-  getTileInformation({ x, y }: Coordinates) {
-    const unitAtCoords = this.units.find(
-      ({ coordinates }) => coordinates.x === x && coordinates.y === y
+    return this.mapManager.units.map(
+      unit =>
+        new BattleUnitManagementService({
+          ...unit,
+          gameManager: this.gameManager
+        })
     );
-    const tileAtCoords = this.mapManager.getTileAtCoordinates({ x, y });
-
-    return {
-      tile: tileAtCoords,
-      unit: unitAtCoords
-    };
   }
 
   private processEnemyTurn() {}
-
-  private addUnit({
-    unit,
-    coordinates,
-    allegiance,
-    behavior
-  }: UnitCoordinates & {
-    behavior: UnitBehaviorType;
-    allegiance: UnitAllegianceType;
-  }) {}
 }

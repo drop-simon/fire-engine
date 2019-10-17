@@ -2,10 +2,10 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { UnitType, TerrainType } from "../types";
-import { MapConfigType } from "./MapManagementService";
-import { getMapSize } from "./utils";
-import GameManagementService from "./GameManagementService";
+import { Unit, Terrain, UnitAllegiance } from "../../types";
+import MapManagementService, { MapConfigType } from "../MapManagementService";
+import { getMapSize } from "../utils";
+import GameManagementService from "../GameManagementService";
 
 export type Coordinates = {
   x: number;
@@ -13,11 +13,12 @@ export type Coordinates = {
 };
 
 export type UnitCoordinates = {
-  unit: UnitType;
+  unit: Unit;
   coordinates: Coordinates;
+  allegiance: UnitAllegiance;
 };
 
-export interface TerrainWithKey extends TerrainType {
+export interface TerrainWithKey extends Terrain {
   key: string;
   coordinates: Coordinates;
 }
@@ -47,28 +48,28 @@ type GetPathTo = (args: {
 
 export default class UnitPathfindingService {
   gameManager: GameManagementService;
-  map: MapConfigType;
-  unit: UnitType;
+  mapManager: MapManagementService;
+  unit: Unit;
   currentCoordinates: Coordinates;
   processedTiles: TerrainWithKey[] = [];
   tileMap = new Map<string, TerrainWithKey>();
   graph = new Graph();
 
   constructor({
+    mapManager,
     gameManager,
-    unitCoordinates,
-    map
+    unitCoordinates
   }: {
     gameManager: GameManagementService;
+    mapManager: MapManagementService;
     unitCoordinates: UnitCoordinates;
-    map: MapConfigType;
   }) {
     this.gameManager = gameManager;
+    this.mapManager = mapManager;
     this.currentCoordinates = unitCoordinates.coordinates;
     this.unit = unitCoordinates.unit;
-    this.map = map;
 
-    map.terrain.forEach((row, y) => {
+    mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
         const tile = this.getTile({ x, y });
@@ -194,14 +195,14 @@ export default class UnitPathfindingService {
   }
 
   private isWithinBounds = ({ x, y }: Coordinates) => {
-    const { width, height } = getMapSize(this.map);
+    const { width, height } = getMapSize(this.mapManager.map);
     const outOfBoundsX = x < 0 || x > width;
     const outOfBoundsY = y < 0 || y > height;
     return !(outOfBoundsX || outOfBoundsY);
   };
 
   private getTile({ x, y }: Coordinates): TerrainWithKey {
-    const row = this.map.terrain[y];
+    const row = this.mapManager.map.terrain[y];
     if (!row) {
       return null;
     }
@@ -215,8 +216,6 @@ export default class UnitPathfindingService {
       coordinates: { x, y }
     };
   }
-
-  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 
   private createDijkstraNode = (coordinates: Coordinates) => {
     const tile = this.getTile(coordinates);
@@ -235,4 +234,6 @@ export default class UnitPathfindingService {
     };
     return { value: dijkstraNode, key: tile.key };
   };
+
+  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 }

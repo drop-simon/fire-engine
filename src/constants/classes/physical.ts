@@ -1,6 +1,6 @@
-import { PhysicalUnitClassConfigType } from "../../types";
+import { PhysicalUnitClassConfig } from "../../types";
 
-export const Lord: PhysicalUnitClassConfigType = {
+export const Lord: PhysicalUnitClassConfig = {
   name: "Lord",
   category: "Physical",
   flying: false,
@@ -23,7 +23,7 @@ export const Lord: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Lady: PhysicalUnitClassConfigType = {
+export const Lady: PhysicalUnitClassConfig = {
   name: "Lady",
   category: "Physical",
   flying: false,
@@ -46,7 +46,7 @@ export const Lady: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Myrmidon: PhysicalUnitClassConfigType = {
+export const Myrmidon: PhysicalUnitClassConfig = {
   name: "Myrmidon",
   category: "Physical",
   flying: false,
@@ -69,7 +69,7 @@ export const Myrmidon: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Mercenary: PhysicalUnitClassConfigType = {
+export const Mercenary: PhysicalUnitClassConfig = {
   name: "Mercenary",
   category: "Physical",
   flying: false,
@@ -92,7 +92,7 @@ export const Mercenary: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Hero: PhysicalUnitClassConfigType = {
+export const Hero: PhysicalUnitClassConfig = {
   name: "Hero",
   category: "Physical",
   flying: false,
@@ -115,7 +115,7 @@ export const Hero: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Knight: PhysicalUnitClassConfigType = {
+export const Knight: PhysicalUnitClassConfig = {
   name: "Knight",
   category: "Physical",
   flying: false,
@@ -138,7 +138,7 @@ export const Knight: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Pirate: PhysicalUnitClassConfigType = {
+export const Pirate: PhysicalUnitClassConfig = {
   name: "Pirate",
   category: "Physical",
   flying: false,
@@ -161,7 +161,7 @@ export const Pirate: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Cavalier: PhysicalUnitClassConfigType = {
+export const Cavalier: PhysicalUnitClassConfig = {
   name: "Thief",
   category: "Physical",
   flying: false,
@@ -184,7 +184,7 @@ export const Cavalier: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Fighter: PhysicalUnitClassConfigType = {
+export const Fighter: PhysicalUnitClassConfig = {
   name: "Fighter",
   category: "Physical",
   flying: false,
@@ -207,7 +207,7 @@ export const Fighter: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Recruit: PhysicalUnitClassConfigType = {
+export const Recruit: PhysicalUnitClassConfig = {
   name: "Recruit",
   category: "Physical",
   flying: false,
@@ -230,7 +230,7 @@ export const Recruit: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Journeyman: PhysicalUnitClassConfigType = {
+export const Journeyman: PhysicalUnitClassConfig = {
   name: "Journeyman",
   category: "Physical",
   flying: false,
@@ -253,7 +253,7 @@ export const Journeyman: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Archer: PhysicalUnitClassConfigType = {
+export const Archer: PhysicalUnitClassConfig = {
   name: "Archer",
   category: "Physical",
   flying: false,
@@ -276,7 +276,7 @@ export const Archer: PhysicalUnitClassConfigType = {
   }
 };
 
-export const PegasusKnight: PhysicalUnitClassConfigType = {
+export const PegasusKnight: PhysicalUnitClassConfig = {
   name: "Pegasus Knight",
   category: "Physical",
   flying: true,
@@ -299,7 +299,7 @@ export const PegasusKnight: PhysicalUnitClassConfigType = {
   }
 };
 
-export const WyvernRider: PhysicalUnitClassConfigType = {
+export const WyvernRider: PhysicalUnitClassConfig = {
   name: "Wyvern Rider",
   category: "Physical",
   flying: true,
@@ -322,7 +322,7 @@ export const WyvernRider: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Thief: PhysicalUnitClassConfigType = {
+export const Thief: PhysicalUnitClassConfig = {
   name: "Thief",
   category: "Physical",
   flying: false,
@@ -345,7 +345,7 @@ export const Thief: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Assassin: PhysicalUnitClassConfigType = {
+export const Assassin: PhysicalUnitClassConfig = {
   name: "Assassin",
   category: "Physical",
   flying: false,
@@ -368,7 +368,7 @@ export const Assassin: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Rogue: PhysicalUnitClassConfigType = {
+export const Rogue: PhysicalUnitClassConfig = {
   name: "Rogue",
   category: "Physical",
   flying: false,
@@ -391,7 +391,7 @@ export const Rogue: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Warrior: PhysicalUnitClassConfigType = {
+export const Warrior: PhysicalUnitClassConfig = {
   name: "Warrior",
   category: "Physical",
   flying: false,
@@ -414,7 +414,7 @@ export const Warrior: PhysicalUnitClassConfigType = {
   }
 };
 
-export const Nomad: PhysicalUnitClassConfigType = {
+export const Nomad: PhysicalUnitClassConfig = {
   name: "Nomad",
   category: "Physical",
   flying: false,
@@ -437,7 +437,7 @@ export const Nomad: PhysicalUnitClassConfigType = {
   }
 };
 
-export const NomadicTrooper: PhysicalUnitClassConfigType = {
+export const NomadicTrooper: PhysicalUnitClassConfig = {
   name: "Nomadic Trooper",
   category: "Physical",
   flying: false,

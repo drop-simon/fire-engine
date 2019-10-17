@@ -1,4 +1,4 @@
-import { StatListType, UnitDependantFunctionType, UnitType } from "../unit";
+import { StatListType, UnitDependantFunction, Unit } from "../unit";
 import { ItemBaseConfig } from "./item";
 import BattleManagementService from "../../services/BattleManagementService";
 
@@ -11,9 +11,9 @@ export type ConsumableItemConfig = ItemBaseConfig & {
     };
     curesPoison?: boolean;
   };
-  getIsUseableInOverworld: UnitDependantFunctionType<boolean>;
+  getIsUseableInOverworld: UnitDependantFunction<boolean>;
   getIsUseableInBattle: (config: {
-    unit: UnitType;
+    unit: Unit;
     battleManager: BattleManagementService;
   }) => boolean;
 };

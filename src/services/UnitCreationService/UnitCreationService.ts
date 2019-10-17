@@ -1,17 +1,17 @@
 import {
-  UnitConfigType,
+  UnitConfig,
   StatGrowthRateListType,
   StatListType,
   AnyUnitClassConfigType,
-  CombatCategoryType
+  CombatCategory
 } from "../../types";
 import { Months } from "../../constants";
 import { createGrowthRates } from "./utils";
 import { increaseStats } from "../utils";
 
-export default class UnitCreationService<C extends CombatCategoryType> {
-  config: UnitConfigType<C>;
-  constructor(config: UnitConfigType<C>) {
+export default class UnitCreationService<C extends CombatCategory> {
+  config: UnitConfig<C>;
+  constructor(config: UnitConfig<C>) {
     this.config = config;
   }
 

@@ -8,7 +8,7 @@ export const Calypso = new UnitCreationService<"Physical">({
   birthMonth: "September",
   bloodType: "A",
   sex: "F",
-  items: [Items.Weapons.Axes.SilverAxe],
+  items: [Items.Weapons.SilverAxe],
   weaponLevels: [{ specialty: "Lances", level: "A" }],
   supports: {},
   base: Lord
@@ -20,7 +20,7 @@ export const Artemis = new UnitCreationService<"Physical">({
   birthMonth: "June",
   bloodType: "AB",
   sex: "M",
-  items: [Items.Weapons.Axes.SilverAxe],
+  items: [Items.Weapons.SilverAxe],
   weaponLevels: [{ specialty: "Axes", level: "A" }],
   supports: {},
   base: Lord

@@ -1,6 +1,6 @@
-import { ConsumableItemConfig, StatListType, UnitType } from "../../types";
+import { ConsumableItemConfig, StatListType, Unit } from "../../types";
 
-const getCanIncreaseUnitStat = (unit: UnitType, stat: keyof StatListType) =>
+const getCanIncreaseUnitStat = (unit: Unit, stat: keyof StatListType) =>
   unit.base.maxStats[stat] > unit.stats[stat];
 
 export const Vulnerary: ConsumableItemConfig = {
@@ -162,7 +162,7 @@ export const ChestKey: ConsumableItemConfig = {
 
     const { currentCoordinates, createTileKey } = pathfinder;
 
-    return battleManager.chests.some(
+    return battleManager.mapManager.chests.some(
       ({ coordinates, isOpened }) =>
         !isOpened &&
         createTileKey(coordinates) === createTileKey(currentCoordinates)

@@ -1,18 +1,18 @@
 import {
-  PhysicalWeaponSpecialtyType,
-  MagicWeaponSpecialtyType,
-  SpecialWeaponSpecialtyType,
+  PhysicalWeaponSpecialty,
+  MagicWeaponSpecialty,
+  SpecialWeaponSpecialty,
   WeaponLevelType,
   SupportDialogueType,
   SupportLevelType,
-  BirthMonthType,
+  BirthMonthType as BirthMonth,
   BloodType
 } from ".";
-import { ItemType, CombatCategoryType, WeaponSpecialtyType } from ".";
+import { Item, CombatCategory, WeaponSpecialty } from ".";
 import UnitCreationService from "../services/UnitCreationService";
-import UnitManagementService from "../services/UnitManagementService";
+import BattleUnitManagementService from "../services/BattleManagementService/BattleUnitManagementService";
 
-export type PhysicalUnitType =
+export type PhysicalUnitClassName =
   | "Archer"
   | "Assassin"
   | "Berserker"
@@ -31,22 +31,24 @@ export type PhysicalUnitType =
   | "Lord"
   | "Mercenary"
   | "Myrmidon"
+  | "Nomad"
+  | "Nomadic Trooper"
   | "Paladin"
   | "Pegasus Knight"
   | "Pirate"
   | "Ranger"
+  | "Recruit"
   | "Rogue"
   | "Sniper"
   | "Soldier"
   | "Swordmaster"
   | "Thief"
-  | "Recruit"
   | "Warrior"
   | "Wyvern Knight"
   | "Wyvern Lord"
   | "Wyvern Rider";
 
-export type MagicUnitType =
+export type MagicUnitClassName =
   | "Bishop"
   | "Cleric"
   | "Druid"
@@ -60,10 +62,22 @@ export type MagicUnitType =
   | "Troubador"
   | "Valkyrie";
 
-export type SpecialUnitType = "Dancer" | "Bard" | "Villager" | "Magic Seal";
+export type SpecialUnitClassName =
+  | "Dancer"
+  | "Bard"
+  | "Villager"
+  | "Magic Seal";
 
-interface BaseUnitClassConfigType {
-  name: string;
+export type UnitClassName<C extends CombatCategory> = C extends "Magic"
+  ? MagicUnitClassName
+  : C extends "Special"
+  ? SpecialUnitClassName
+  : PhysicalUnitClassName;
+
+interface BaseUnitClassConfig<C extends CombatCategory> {
+  name: UnitClassName<C>;
+  category: C;
+  weapons: WeaponSpecialty<C>[];
   flying: boolean;
   horseback: boolean;
   armored: boolean;
@@ -83,33 +97,24 @@ interface BaseUnitClassConfigType {
   };
 }
 
-export interface MagicUnitClassConfigType extends BaseUnitClassConfigType {
-  category: "Magic";
-  weapons: MagicWeaponSpecialtyType[];
-}
+export interface MagicUnitClassConfig extends BaseUnitClassConfig<"Magic"> {}
 
-export interface PhysicalUnitClassConfigType extends BaseUnitClassConfigType {
-  category: "Physical";
-  weapons: PhysicalWeaponSpecialtyType[];
-}
+export interface PhysicalUnitClassConfig
+  extends BaseUnitClassConfig<"Physical"> {}
 
-export interface SpecialUnitClassConfigType extends BaseUnitClassConfigType {
-  category: "Special";
-  weapons: SpecialWeaponSpecialtyType[];
-}
+export interface SpecialUnitClassConfig
+  extends BaseUnitClassConfig<"Special"> {}
 
 export type AnyUnitClassConfigType =
-  | MagicUnitClassConfigType
-  | PhysicalUnitClassConfigType
-  | SpecialUnitClassConfigType;
+  | MagicUnitClassConfig
+  | PhysicalUnitClassConfig
+  | SpecialUnitClassConfig;
 
-export type UnitClassConfigType<
-  C extends CombatCategoryType
-> = C extends "Physical"
-  ? PhysicalUnitClassConfigType
+export type UnitClassConfig<C extends CombatCategory> = C extends "Physical"
+  ? PhysicalUnitClassConfig
   : C extends "Magic"
-  ? MagicUnitClassConfigType
-  : SpecialUnitClassConfigType;
+  ? MagicUnitClassConfig
+  : SpecialUnitClassConfig;
 
 export type StatListType = {
   health: number;
@@ -153,34 +158,32 @@ export interface UnitSupportType {
   level: SupportLevelType | null;
 }
 
-export interface UnitConfigType<C extends CombatCategoryType> {
+export interface UnitConfig<C extends CombatCategory> {
   name: string;
   sex: "M" | "F";
-  birthMonth: BirthMonthType;
+  birthMonth: BirthMonth;
   bloodType: BloodType;
   level: number;
-  base: UnitClassConfigType<C>;
+  base: UnitClassConfig<C>;
   supports: { [unitName: string]: SupportLevelType };
-  items: ItemType[];
+  items: Item[];
   weaponLevels: {
-    specialty: WeaponSpecialtyType<C>;
-    level: C extends SpecialUnitType ? null : WeaponLevelType;
+    specialty: WeaponSpecialty<C>;
+    level: C extends SpecialUnitClassName ? null : WeaponLevelType;
   }[];
 }
 
-export type AnyUnitType = UnitConfigType<CombatCategoryType>;
+export type AnyUnit = UnitConfig<CombatCategory>;
 
-export type UnitType = ReturnType<
-  UnitCreationService<CombatCategoryType>["process"]
->;
+export type Unit = ReturnType<UnitCreationService<CombatCategory>["process"]>;
 
-export type ManagedUnitType = UnitManagementService;
+export type BattleManagedUnit = BattleUnitManagementService;
 
-export type UnitDependantFunctionType<T extends any> = (unit: UnitType) => T;
+export type UnitDependantFunction<T extends any> = (unit?: Unit) => T;
 
-export type UnitAllegianceType = "PLAYER" | "ENEMY" | "NEUTRAL";
+export type UnitAllegiance = "PLAYER" | "ENEMY" | "NEUTRAL";
 
-export type UnitBehaviorType =
+export type UnitBehavior =
   | "STATIONARY"
   | "PASSIVE"
   | "ACTIVE"

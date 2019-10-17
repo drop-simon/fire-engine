@@ -1,14 +1,14 @@
-import { UnitType } from "../types";
+import { Unit } from "../types";
 
 const DialogueActions = {
-  AddUnits: (units: UnitType[]) =>
+  AddUnits: (units: Unit[]) =>
     ({ type: "ADD_UNITS", payload: { units } } as const),
-  DismissUnits: (units: UnitType[]) =>
+  DismissUnits: (units: Unit[]) =>
     ({
       type: "DISMISS_UNITS",
       payload: { units }
     } as const),
-  OpenDialogue: (unit: UnitType, dialogue: string) =>
+  OpenDialogue: (unit: Unit, dialogue: string) =>
     ({
       type: "OPEN_DIALOGUE",
       payload: { unit, dialogue }
@@ -23,20 +23,20 @@ export type DialogueQueue = ReturnType<DialogueCreationService["process"]>;
 
 export default class DialogueCreationService {
   dialogueQueue: DialogueActionConfig[] = [];
-  units: UnitType[] = [];
+  units: Unit[] = [];
 
   process() {
     return this.dialogueQueue;
   }
 
-  addUnits(units: UnitType[]) {
+  addUnits(units: Unit[]) {
     this.units.push(...units);
     const action = DialogueActions.AddUnits(units);
     this.dialogueQueue.push(action);
     return this;
   }
 
-  dismissUnits(units: UnitType[]) {
+  dismissUnits(units: Unit[]) {
     const unitNames = units.map(unit => unit.name);
     this.units = this.units.filter(unit => !unitNames.includes(unit.name));
 
@@ -46,7 +46,7 @@ export default class DialogueCreationService {
     return this;
   }
 
-  openDialogue({ unit, dialogue }: { unit: UnitType; dialogue: string }) {
+  openDialogue({ unit, dialogue }: { unit: Unit; dialogue: string }) {
     const action = DialogueActions.OpenDialogue(unit, dialogue);
     this.dialogueQueue.push(action);
     return this;

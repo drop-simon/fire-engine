@@ -1,17 +1,17 @@
-import { WeaponType, CombatCategoryType, UnitType } from "../types";
-import { increaseStats } from "./utils";
-import GameManagementService from "./GameManagementService";
+import { WeaponType, CombatCategory, Unit } from "../../types";
+import { increaseStats } from "../utils";
+import GameManagementService from "../GameManagementService";
 
-interface UnitManagementServiceConfigType {
-  unit: UnitType;
-  gameManager?: GameManagementService;
+interface BattleUnitManagementServiceConfig {
+  unit: Unit;
+  gameManager: GameManagementService;
 }
 
-export default class UnitManagementService {
-  unit: UnitType;
+export default class BattleUnitManagementService {
+  unit: Unit;
   gameManager: GameManagementService;
 
-  constructor({ unit, gameManager }: UnitManagementServiceConfigType) {
+  constructor({ unit, gameManager }: BattleUnitManagementServiceConfig) {
     this.unit = unit;
     this.gameManager = gameManager;
   }
@@ -37,14 +37,19 @@ export default class UnitManagementService {
     return this;
   }
 
-  get equippedWeapon(): WeaponType | undefined {
-    const weapon = this.unit.items.find(item =>
+  get weapons() {
+    return this.unit.items.filter(
+      ({ category }) => category === "Weapon"
+    ) as WeaponType[];
+  }
+
+  get equippedWeapon() {
+    return this.weapons.find(weapon =>
       this.unit.weaponLevels.some(
         ({ specialty, level }) =>
-          specialty === item.specialty && level <= item.level
+          specialty == weapon.specialty && level <= weapon.level
       )
     );
-    return weapon as WeaponType | undefined;
   }
 
   get conflictStats() {

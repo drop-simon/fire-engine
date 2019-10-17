@@ -1,6 +1,6 @@
-import { MagicUnitClassConfigType } from "../../types";
+import { MagicUnitClassConfig } from "../../types";
 
-export const Pupil: MagicUnitClassConfigType = {
+export const Pupil: MagicUnitClassConfig = {
   name: "Pupil",
   category: "Magic",
   horseback: false,
@@ -22,7 +22,7 @@ export const Pupil: MagicUnitClassConfigType = {
   }
 };
 
-export const Mage: MagicUnitClassConfigType = {
+export const Mage: MagicUnitClassConfig = {
   name: "Mage",
   category: "Magic",
   horseback: false,
@@ -44,7 +44,7 @@ export const Mage: MagicUnitClassConfigType = {
   }
 };
 
-export const Shaman: MagicUnitClassConfigType = {
+export const Shaman: MagicUnitClassConfig = {
   name: "Shaman",
   category: "Magic",
   horseback: false,
@@ -66,7 +66,7 @@ export const Shaman: MagicUnitClassConfigType = {
   }
 };
 
-export const Summoner: MagicUnitClassConfigType = {
+export const Summoner: MagicUnitClassConfig = {
   name: "Summoner",
   category: "Magic",
   horseback: false,
@@ -88,7 +88,7 @@ export const Summoner: MagicUnitClassConfigType = {
   }
 };
 
-export const Monk: MagicUnitClassConfigType = {
+export const Monk: MagicUnitClassConfig = {
   name: "Monk",
   category: "Magic",
   horseback: false,
@@ -110,7 +110,7 @@ export const Monk: MagicUnitClassConfigType = {
   }
 };
 
-export const Cleric: MagicUnitClassConfigType = {
+export const Cleric: MagicUnitClassConfig = {
   name: "Cleric",
   category: "Magic",
   horseback: false,
@@ -132,7 +132,7 @@ export const Cleric: MagicUnitClassConfigType = {
   }
 };
 
-export const Troubador: MagicUnitClassConfigType = {
+export const Troubador: MagicUnitClassConfig = {
   name: "Troubador",
   category: "Magic",
   horseback: true,
@@ -154,7 +154,7 @@ export const Troubador: MagicUnitClassConfigType = {
   }
 };
 
-export const Valkyrie: MagicUnitClassConfigType = {
+export const Valkyrie: MagicUnitClassConfig = {
   name: "Valkyrie",
   category: "Magic",
   horseback: true,
@@ -176,7 +176,7 @@ export const Valkyrie: MagicUnitClassConfigType = {
   }
 };
 
-export const Sage: MagicUnitClassConfigType = {
+export const Sage: MagicUnitClassConfig = {
   name: "Sage",
   category: "Magic",
   horseback: false,
@@ -198,7 +198,7 @@ export const Sage: MagicUnitClassConfigType = {
   }
 };
 
-export const MageKnight: MagicUnitClassConfigType = {
+export const MageKnight: MagicUnitClassConfig = {
   name: "Mage Knight",
   category: "Magic",
   horseback: true,
@@ -220,7 +220,7 @@ export const MageKnight: MagicUnitClassConfigType = {
   }
 };
 
-export const Druid: MagicUnitClassConfigType = {
+export const Druid: MagicUnitClassConfig = {
   name: "Druid",
   category: "Magic",
   horseback: false,
@@ -242,7 +242,7 @@ export const Druid: MagicUnitClassConfigType = {
   }
 };
 
-export const Bishop: MagicUnitClassConfigType = {
+export const Bishop: MagicUnitClassConfig = {
   name: "Bishop",
   category: "Magic",
   horseback: false,

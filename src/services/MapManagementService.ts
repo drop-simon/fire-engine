@@ -1,32 +1,51 @@
 import UnitPathfindingService, {
   UnitCoordinates,
-  Coordinates
-} from "./UnitPathfindingService";
-import { TerrainCreatorType, UnitType } from "../types";
+  Coordinates,
+  TerrainWithKey
+} from "./BattleManagementService/UnitPathfindingService";
+import { TerrainCreator, Unit, UnitBehavior, UnitAllegiance } from "../types";
 import GameManagementService from "./GameManagementService";
+import { getMapSize } from "./utils";
 
-export type MapConfigType = { terrain: TerrainCreatorType[][] };
+export type MapConfigType = {
+  terrain: TerrainCreator[][];
+};
 
 export interface MapManagementServiceConstructor {
   map: MapConfigType;
-  units: UnitCoordinates[];
+  enemyUnits?: UnitCoordinates[];
+  playerUnits?: UnitCoordinates[];
+  neutralUnits?: UnitCoordinates[];
   gameManager: GameManagementService;
 }
 
 export default class MapManagementService {
-  map: MapConfigType;
-  units: UnitCoordinates[];
+  map: MapConfigType & ReturnType<typeof getMapSize>;
   gameManager: GameManagementService;
   pathfinders: { [key: string]: UnitPathfindingService };
 
-  constructor({ map, units, gameManager }: MapManagementServiceConstructor) {
-    this.map = map;
-    this.units = units;
+  enemyUnits: UnitCoordinates[] = [];
+  playerUnits: UnitCoordinates[] = [];
+  neutralUnits: UnitCoordinates[] = [];
+
+  chests: { coordinates: Coordinates; isOpened?: false }[] = [];
+
+  constructor({
+    map,
+    enemyUnits = [],
+    playerUnits = [],
+    neutralUnits = [],
+    gameManager
+  }: MapManagementServiceConstructor) {
+    this.enemyUnits = enemyUnits;
+    this.playerUnits = playerUnits;
+    this.neutralUnits = neutralUnits;
+    this.map = { ...map, ...getMapSize(map) };
     this.gameManager = gameManager;
-    this.pathfinders = units.reduce(
+    this.pathfinders = this.units.reduce(
       (acc, unitCoordinates) => {
         const pathfinder = new UnitPathfindingService({
-          map: this.map,
+          mapManager: this,
           unitCoordinates,
           gameManager: this.gameManager
         });
@@ -37,20 +56,60 @@ export default class MapManagementService {
     );
   }
 
-  getTileAtCoordinates({ x, y }: Coordinates) {
-    const terrainCreator = this.map.terrain[y][x];
-    return terrainCreator({ base: { promotions: [], name: "" } } as UnitType);
+  get units() {
+    return [...this.playerUnits, ...this.neutralUnits, ...this.enemyUnits];
   }
 
-  addUnits(units: UnitCoordinates[]) {
-    units.forEach(unitCoordinates => {
-      const pathfinder = new UnitPathfindingService({
-        map: this.map,
-        unitCoordinates,
-        gameManager: this.gameManager
-      });
-      this.pathfinders[unitCoordinates.unit.name] = pathfinder;
+  addUnit(unitCoordinates: UnitCoordinates) {
+    switch (unitCoordinates.allegiance) {
+      case "ENEMY": {
+        this.enemyUnits.push(unitCoordinates);
+        break;
+      }
+      case "PLAYER": {
+        this.playerUnits.push(unitCoordinates);
+        break;
+      }
+      case "NEUTRAL": {
+        this.neutralUnits.push(unitCoordinates);
+        break;
+      }
+      default:
+        break;
+    }
+    const pathfinder = new UnitPathfindingService({
+      gameManager: this.gameManager,
+      mapManager: this,
+      unitCoordinates
     });
+    this.pathfinders[unitCoordinates.unit.name] = pathfinder;
     return this;
   }
+
+  addUnits(
+    units: (UnitCoordinates & {
+      allegiance: UnitAllegiance;
+    })[]
+  ) {
+    units.forEach(this.addUnit);
+    return this;
+  }
+
+  getTile({ x, y }: Coordinates, unit?: Unit): TerrainWithKey {
+    const row = this.map.terrain[y];
+    if (!row) {
+      return null;
+    }
+    const terrainCreator = row[x];
+    if (!terrainCreator) {
+      return null;
+    }
+    return {
+      ...terrainCreator(unit),
+      key: this.createTileKey({ x, y }),
+      coordinates: { x, y }
+    };
+  }
+
+  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 }

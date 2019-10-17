@@ -7,28 +7,26 @@ const CombatCategories = {
   Special: "Special"
 } as const;
 
-export type PhysicalWeaponSpecialtyType = "Swords" | "Lances" | "Axes" | "Bows";
+export type PhysicalWeaponSpecialty = "Swords" | "Lances" | "Axes" | "Bows";
 
-export type MagicWeaponSpecialtyType = "Anima" | "Light" | "Dark" | "Staves";
+export type MagicWeaponSpecialty = "Anima" | "Light" | "Dark" | "Staves";
 
-export type SpecialWeaponSpecialtyType = "Ring" | "Instrument" | "None";
+export type SpecialWeaponSpecialty = "Ring" | "Instrument" | "None";
 
-export type AnyWeaponSpecialtyType =
-  | PhysicalWeaponSpecialtyType
-  | MagicWeaponSpecialtyType
-  | SpecialWeaponSpecialtyType;
+export type AnyWeaponSpecialty =
+  | PhysicalWeaponSpecialty
+  | MagicWeaponSpecialty
+  | SpecialWeaponSpecialty;
 
-export type WeaponSpecialtyType<
-  C extends CombatCategoryType
-> = C extends "Magic"
-  ? MagicWeaponSpecialtyType
+export type WeaponSpecialty<C extends CombatCategory> = C extends "Magic"
+  ? MagicWeaponSpecialty
   : C extends "Physical"
-  ? PhysicalWeaponSpecialtyType
-  : SpecialWeaponSpecialtyType;
+  ? PhysicalWeaponSpecialty
+  : SpecialWeaponSpecialty;
 
 export type WeaponLevelType = "S" | "A" | "B" | "C" | "D" | "E";
 
-export type CombatCategoryType = keyof typeof CombatCategories;
+export type CombatCategory = keyof typeof CombatCategories;
 
 export type WeaponEffectType = {
   static?: {
@@ -39,11 +37,11 @@ export type WeaponEffectType = {
   };
 };
 
-export interface WeaponConfigType<C extends CombatCategoryType>
+export interface WeaponConfigType<C extends CombatCategory>
   extends ItemBaseConfig {
   subcategory: C;
   name: string;
-  specialty: WeaponSpecialtyType<C>;
+  specialty: WeaponSpecialty<C>;
   level: C extends "Special" ? null : WeaponLevelType;
   description?: string;
   effects?: WeaponEffectType;
@@ -61,4 +59,7 @@ export type SpecialWeaponConfigType = WeaponConfigType<"Special">;
 
 export type WeaponNameType = keyof typeof Items["Weapons"];
 
-export type WeaponType = typeof Items["Weapons"][WeaponNameType];
+export type WeaponType =
+  | PhysicalWeaponConfigType
+  | MagicWeaponConfigType
+  | SpecialWeaponConfigType;

@@ -1,40 +1,28 @@
-import DialogueCreationService, {
-  DialogueQueue
-} from "./DialogueCreationService";
+import { DialogueQueue } from "./DialogueCreationService";
 import BattleManagementService from "./BattleManagementService";
 
-export type ChapterGoalType = {
-  description: string;
-  endCondition: (map: any) => boolean;
-  failCondition: (map: any) => boolean;
-};
+export type ChapterQueueItem =
+  | {
+      type: "DIALOGUE";
+      item: DialogueQueue;
+    }
+  | {
+      type: "BATTLE";
+      item: BattleManagementService;
+    };
 
-interface ChapterCreationServiceConstructor {
-  goal: ChapterGoalType;
-}
-
-export type ChapterType = {
-  goal: ChapterGoalType;
-};
-
-export type ChapterQueueItem = {
-  type: "DIALOGUE";
-  item: DialogueQueue;
-};
-
-export type ChapterQueue = ReturnType<ChapterCreationService["process"]>;
+export type Chapter = ReturnType<ChapterCreationService["process"]>;
 
 export default class ChapterCreationService {
-  goal: ChapterGoalType;
-  queue: ChapterQueueItem[];
-
-  constructor({ goal }: ChapterCreationServiceConstructor) {
-    this.goal = goal;
-    this.queue = [];
+  queue: ChapterQueueItem[] = [];
+  name: string;
+  constructor(chapterName: string) {
+    this.name = chapterName;
   }
 
   process() {
-    return this.queue;
+    const { name, queue } = this;
+    return { name, queue };
   }
 
   addToChapter(queueItem: ChapterQueueItem) {

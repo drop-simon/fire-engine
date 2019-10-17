@@ -1,9 +1,9 @@
 import { ItemBaseConfig } from "./item";
-import { CombatCategoryType } from "./weapon";
-import { UnitClassConfigType } from "../unit";
+import { CombatCategory } from "./weapon";
+import { UnitClassConfig } from "../unit";
 
-export interface PromotionalItemConfig<C extends CombatCategoryType>
+export interface PromotionalItemConfig<C extends CombatCategory>
   extends ItemBaseConfig {
   name: string;
-  applicableUnits: UnitClassConfigType<C>[];
+  applicableUnits: UnitClassConfig<C>[];
 }
