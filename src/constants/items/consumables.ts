@@ -9,8 +9,8 @@ export const Vulnerary: ConsumableItemConfig = {
   maxUses: 3,
   category: "Consumable",
   effect: { static: { health: 10 } },
-  getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => true,
+  getCanUseInOverworld: () => false,
   cost: 300
 };
 
@@ -20,8 +20,8 @@ export const Elixir: ConsumableItemConfig = {
   maxUses: 3,
   category: "Consumable",
   effect: { static: { health: 60 } },
-  getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => true,
+  getCanUseInOverworld: () => false,
   cost: 3000
 };
 
@@ -31,8 +31,8 @@ export const Antitoxin: ConsumableItemConfig = {
   maxUses: 2,
   category: "Consumable",
   effect: { curesPoison: true },
-  getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => true,
+  getCanUseInOverworld: () => false,
   cost: 450
 };
 
@@ -42,8 +42,8 @@ export const PureWater: ConsumableItemConfig = {
   maxUses: 2,
   category: "Consumable",
   effect: { ongoing: { resistance: { amount: 2, numTurns: 3 } } },
-  getIsUseableInBattle: () => true,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => true,
+  getCanUseInOverworld: () => false,
   cost: 900
 };
 
@@ -53,8 +53,8 @@ export const Speedwing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { speed: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "speed"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "speed"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "speed"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "speed"),
   cost: 8000
 };
 
@@ -64,8 +64,8 @@ export const SkillTome: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { skill: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "skill"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "skill"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "skill"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "skill"),
   cost: 8000
 };
 
@@ -75,8 +75,8 @@ export const EnergyRing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { power: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "power"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "power"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "power"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "power"),
   cost: 8000
 };
 
@@ -86,8 +86,8 @@ export const DragonShield: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { defense: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "defense"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "defense"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "defense"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "defense"),
   cost: 8000
 };
 
@@ -97,9 +97,8 @@ export const Talisman: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { resistance: 2 } },
-  getIsUseableInBattle: ({ unit }) =>
-    getCanIncreaseUnitStat(unit, "resistance"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "resistance"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "resistance"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "resistance"),
   cost: 8000
 };
 
@@ -109,8 +108,8 @@ export const AngelicRobe: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { health: 7 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "health"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "health"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "health"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "health"),
   cost: 8000
 };
 
@@ -120,8 +119,8 @@ export const GoddessIcon: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { luck: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "luck"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "luck"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "luck"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "luck"),
   cost: 8000
 };
 
@@ -131,9 +130,8 @@ export const BodyRing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { constitution: 2 } },
-  getIsUseableInBattle: ({ unit }) =>
-    getCanIncreaseUnitStat(unit, "constitution"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "constitution"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "constitution"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "constitution"),
   cost: 8000
 };
 
@@ -143,8 +141,8 @@ export const Swiftsoles: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getIsUseableInBattle: ({ unit }) => getCanIncreaseUnitStat(unit, "movement"),
-  getIsUseableInOverworld: unit => getCanIncreaseUnitStat(unit, "movement"),
+  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "movement"),
+  getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "movement"),
   cost: 8000
 };
 
@@ -154,7 +152,7 @@ export const ChestKey: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getIsUseableInBattle: ({ unit, battleManager }) => {
+  getCanUseInMap: ({ unit, battleManager }) => {
     const pathfinder = battleManager.mapManager.pathfinders[unit.name];
     if (unit.items.length > 4 || !pathfinder) {
       return false;
@@ -168,7 +166,7 @@ export const ChestKey: ConsumableItemConfig = {
         createTileKey(coordinates) === createTileKey(currentCoordinates)
     );
   },
-  getIsUseableInOverworld: () => false,
+  getCanUseInOverworld: () => false,
   cost: 300
 };
 
@@ -178,7 +176,7 @@ export const DoorKey: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getIsUseableInBattle: ({ unit, battleManager }) => {
+  getCanUseInMap: ({ unit, battleManager }) => {
     const pathfinder = battleManager.mapManager.pathfinders[unit.name];
     if (!pathfinder) {
       return false;
@@ -188,7 +186,7 @@ export const DoorKey: ConsumableItemConfig = {
       tile => tile.name === "door"
     );
   },
-  getIsUseableInOverworld: () => false,
+  getCanUseInOverworld: () => false,
   cost: 50
 };
 
@@ -198,16 +196,16 @@ export const Lockpick: ConsumableItemConfig = {
   maxUses: 15,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getIsUseableInBattle: ({ unit, battleManager }) => {
+  getCanUseInMap: ({ unit, battleManager }) => {
     if (unit.base.name !== "Thief") {
       return false;
     }
     return (
-      DoorKey.getIsUseableInBattle({ unit, battleManager }) ||
-      ChestKey.getIsUseableInBattle({ unit, battleManager })
+      DoorKey.getCanUseInMap({ unit, battleManager }) ||
+      ChestKey.getCanUseInMap({ unit, battleManager })
     );
   },
-  getIsUseableInOverworld: () => false,
+  getCanUseInOverworld: () => false,
   cost: 1200
 };
 
@@ -217,8 +215,8 @@ export const RedGem: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: undefined,
-  getIsUseableInBattle: () => false,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => false,
+  getCanUseInOverworld: () => false,
   cost: 5000
 };
 
@@ -228,8 +226,8 @@ export const BlueGem: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: undefined,
-  getIsUseableInBattle: () => false,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => false,
+  getCanUseInOverworld: () => false,
   cost: 10000
 };
 
@@ -239,8 +237,8 @@ export const WhiteGem: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: undefined,
-  getIsUseableInBattle: () => false,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => false,
+  getCanUseInOverworld: () => false,
   cost: 20000
 };
 
@@ -250,8 +248,8 @@ export const BlackGem: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: undefined,
-  getIsUseableInBattle: () => false,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => false,
+  getCanUseInOverworld: () => false,
   cost: 30000
 };
 
@@ -261,7 +259,7 @@ export const GoldGem: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: undefined,
-  getIsUseableInBattle: () => false,
-  getIsUseableInOverworld: () => false,
+  getCanUseInMap: () => false,
+  getCanUseInOverworld: () => false,
   cost: 40000
 };
