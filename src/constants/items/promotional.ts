@@ -1,41 +1,39 @@
 import { PromotionalItemConfig } from "../../types";
-import * as MagicClasses from "../classes/magic";
-import * as PhysicalClasses from "../classes/physical";
+import { createCanUsePromotionalItem } from "./utils";
 
-const { Mage, Cleric, Monk, Shaman } = MagicClasses;
-
-const {
-  Archer,
-  Cavalier,
-  Fighter,
-  Knight,
-  Lady,
-  Lord,
-  Mercenary,
-  Myrmidon,
-  Nomad,
-  PegasusKnight,
-  Pirate,
-  Thief,
-  WyvernRider
-} = PhysicalClasses;
-
+const GUIDING_RING_UNITS = [
+  "Mage" as const,
+  "Cleric" as const,
+  "Monk" as const,
+  "Shaman" as const
+];
 export const GuidingRing: PromotionalItemConfig<"Magic"> = {
   name: "Guiding Ring",
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Mage, Cleric, Monk, Shaman]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, GUIDING_RING_UNITS),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, GUIDING_RING_UNITS)
 };
 
+const HERO_CREST_UNITS = [
+  "Mercenary" as const,
+  "Myrmidon" as const,
+  "Fighter" as const
+];
 export const HeroCrest: PromotionalItemConfig<"Physical"> = {
   name: "Hero Crest",
   category: "Promotional",
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Mercenary, Myrmidon, Fighter]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, HERO_CREST_UNITS),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, HERO_CREST_UNITS)
 };
 
 export const OceanSeal: PromotionalItemConfig<"Physical"> = {
@@ -44,7 +42,10 @@ export const OceanSeal: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Pirate, Thief]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, ["Pirate", "Thief"]),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, ["Pirate", "Thief"])
 };
 
 export const FellContract: PromotionalItemConfig<"Physical"> = {
@@ -53,7 +54,8 @@ export const FellContract: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Thief]
+  getCanUseInMap: ({ unit }) => createCanUsePromotionalItem(unit, ["Thief"]),
+  getCanUseInOverworld: unit => createCanUsePromotionalItem(unit, ["Thief"])
 };
 
 export const KnightCrest: PromotionalItemConfig<"Physical"> = {
@@ -62,7 +64,10 @@ export const KnightCrest: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Knight, Cavalier]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, ["Knight", "Cavalier"]),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, ["Knight", "Cavalier"])
 };
 
 export const OrionsBolt: PromotionalItemConfig<"Physical"> = {
@@ -71,7 +76,10 @@ export const OrionsBolt: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Archer, Nomad]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, ["Archer", "Nomad"]),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, ["Archer", "Nomad"])
 };
 
 export const ElysianWhip: PromotionalItemConfig<"Physical"> = {
@@ -80,7 +88,10 @@ export const ElysianWhip: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [PegasusKnight, WyvernRider]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, ["Pegasus Knight", "Wyvern Rider"]),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, ["Pegasus Knight", "Wyvern Rider"])
 };
 
 export const HeavenSeal: PromotionalItemConfig<"Physical"> = {
@@ -89,5 +100,8 @@ export const HeavenSeal: PromotionalItemConfig<"Physical"> = {
   numUses: 1,
   maxUses: 1,
   cost: 10000,
-  applicableUnits: [Lord, Lady]
+  getCanUseInMap: ({ unit }) =>
+    createCanUsePromotionalItem(unit, ["Lord", "Lady"]),
+  getCanUseInOverworld: unit =>
+    createCanUsePromotionalItem(unit, ["Lord", "Lady"])
 };

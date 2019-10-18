@@ -75,7 +75,7 @@ export default class MapManagementService {
         break;
       }
       default:
-        break;
+        return this;
     }
     const pathfinder = new UnitPathfindingService({
       gameManager: this.gameManager,

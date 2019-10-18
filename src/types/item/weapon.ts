@@ -1,4 +1,4 @@
-import { ItemBaseConfig } from "./item";
+import { ItemBase } from "./item";
 import { Items } from "../../constants";
 
 const CombatCategories = {
@@ -37,8 +37,7 @@ export type WeaponEffectType = {
   };
 };
 
-export interface WeaponConfigType<C extends CombatCategory>
-  extends ItemBaseConfig {
+export interface WeaponConfigType<C extends CombatCategory> extends ItemBase {
   subcategory: C;
   name: string;
   specialty: WeaponSpecialty<C>;

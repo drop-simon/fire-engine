@@ -1,14 +1,29 @@
 import { WeaponConfigType, CombatCategory } from "./weapon";
 import { ConsumableItemConfig } from "./consumable";
 import { PromotionalItemConfig } from "./promotional";
+import { UnitDependantFunction, Unit, StatListType } from "../unit";
+import BattleManagementService from "../../services/BattleManagementService";
 
-type ItemCategoryType = "Weapon" | "Consumable" | "Promotional" | "Other";
+type ItemCategory = "Weapon" | "Consumable" | "Promotional" | "Other";
 
-export interface ItemBaseConfig {
-  category: ItemCategoryType;
+export interface ItemBase {
+  category: ItemCategory;
+  effect?: {
+    static?: Partial<StatListType>;
+    permanent?: Partial<StatListType>;
+    ongoing?: {
+      [key in keyof StatListType]?: { amount: number; numTurns: number };
+    };
+    curesPoison?: boolean;
+  };
   name: string;
   maxUses: number;
   numUses: number;
+  getCanUseInMap: (args?: {
+    battleManager: BattleManagementService;
+    unit: Unit;
+  }) => boolean;
+  getCanUseInOverworld: UnitDependantFunction<boolean>;
   cost: number;
 }
 export type Item =

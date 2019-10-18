@@ -1,8 +1,8 @@
 import { StatListType, UnitDependantFunction, Unit } from "../unit";
-import { ItemBaseConfig } from "./item";
+import { ItemBase } from "./item";
 import BattleManagementService from "../../services/BattleManagementService";
 
-export type ConsumableItemConfig = ItemBaseConfig & {
+export type ConsumableItemConfig = ItemBase & {
   effect?: {
     static?: Partial<StatListType>;
     permanent?: Partial<StatListType>;
@@ -11,9 +11,4 @@ export type ConsumableItemConfig = ItemBaseConfig & {
     };
     curesPoison?: boolean;
   };
-  getIsUseableInOverworld: UnitDependantFunction<boolean>;
-  getIsUseableInBattle: (config: {
-    unit: Unit;
-    battleManager: BattleManagementService;
-  }) => boolean;
 };

@@ -74,6 +74,11 @@ export type UnitClassName<C extends CombatCategory> = C extends "Magic"
   ? SpecialUnitClassName
   : PhysicalUnitClassName;
 
+export type AnyUnitClassName =
+  | MagicUnitClassName
+  | SpecialUnitClassName
+  | PhysicalUnitClassName;
+
 interface BaseUnitClassConfig<C extends CombatCategory> {
   name: UnitClassName<C>;
   category: C;

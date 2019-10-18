@@ -1,5 +1,7 @@
 import { PhysicalWeaponConfigType } from "../../../types";
 
+const getCanUseWeapon = () => false;
+
 export const IronAxe: PhysicalWeaponConfigType = {
   name: "Iron Axe",
   category: "Weapon",
@@ -14,7 +16,9 @@ export const IronAxe: PhysicalWeaponConfigType = {
   weight: 10,
   critical: 0,
   experience: 1,
-  cost: 270
+  cost: 270,
+  getCanUseInMap: getCanUseWeapon,
+  getCanUseInOverworld: getCanUseWeapon
 };
 
 export const SteelAxe: PhysicalWeaponConfigType = {
@@ -31,7 +35,9 @@ export const SteelAxe: PhysicalWeaponConfigType = {
   weight: 12,
   critical: 0,
   experience: 1,
-  cost: 1000
+  cost: 1000,
+  getCanUseInMap: getCanUseWeapon,
+  getCanUseInOverworld: getCanUseWeapon
 };
 
 export const SilverAxe: PhysicalWeaponConfigType = {
@@ -48,5 +54,7 @@ export const SilverAxe: PhysicalWeaponConfigType = {
   weight: 12,
   critical: 0,
   experience: 1,
-  cost: 1000
+  cost: 1000,
+  getCanUseInMap: getCanUseWeapon,
+  getCanUseInOverworld: getCanUseWeapon
 };
