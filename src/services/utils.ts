@@ -1,5 +1,6 @@
 import { StatListType, StatGrowthRateListType } from "../types";
 import { MapConfigType } from "./MapManagementService";
+import { Coordinates } from "./UnitPathfindingService";
 
 // probability is a float between 0 and 1
 export const getProbabilityResult = (probability: number) =>
@@ -28,4 +29,13 @@ export const getMapSize = function(map: MapConfigType) {
   const height = map.terrain.length - 1;
 
   return { width, height };
+};
+
+export const getManhattanDistance = (
+  coordsA: Coordinates,
+  coordsB: Coordinates
+) => {
+  const xDistance = Math.abs(coordsA.x - coordsB.x);
+  const yDistance = Math.abs(coordsA.y - coordsB.y);
+  return xDistance + yDistance;
 };

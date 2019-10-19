@@ -1,7 +1,7 @@
-import { Terrain } from "../constants";
 import { UnitDependantFunction } from ".";
+import { DeepPartial } from "./util";
 
-export type TerrainCreator = UnitDependantFunction<{
+type TerrainBase = {
   name: string;
   movementCost: number;
   effects: {
@@ -13,6 +13,8 @@ export type TerrainCreator = UnitDependantFunction<{
       health: number;
     };
   };
-}>;
+};
 
-export type Terrain = ReturnType<TerrainCreator>;
+export type TerrainConfig = TerrainBase & {
+  getUnitModifications: UnitDependantFunction<DeepPartial<TerrainBase>>;
+};

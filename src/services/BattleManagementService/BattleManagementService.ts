@@ -1,8 +1,6 @@
-import { UnitAllegiance, UnitBehavior, Unit } from "../../types";
-import MapManagementService, { MapConfigType } from "../MapManagementService";
-import { UnitCoordinates } from "./UnitPathfindingService";
+import { UnitAllegiance } from "../../types";
+import MapManagementService from "../MapManagementService";
 import GameManagementService from "../GameManagementService";
-import BattleUnitManagementService from "./BattleUnitManagementService";
 
 type BattleGoalType = {
   description: string;
@@ -32,16 +30,6 @@ export default class BattleManagementService {
     this.goal = goal;
     this.mapManager = mapManager;
     this.gameManager = gameManager;
-  }
-
-  get units() {
-    return this.mapManager.units.map(
-      unit =>
-        new BattleUnitManagementService({
-          ...unit,
-          gameManager: this.gameManager
-        })
-    );
   }
 
   private processEnemyTurn() {}

@@ -1,7 +1,8 @@
 import { Unit, UnitAllegiance, UnitBehavior } from "../../../types";
 import BattleManagementService from "..";
-import { TerrainWithKey } from "../UnitPathfindingService";
+import { TerrainWithKey } from "../../UnitPathfindingService";
 import GameManagementService from "../../GameManagementService";
+import { getManhattanDistance } from "../../utils";
 
 type PathToUnit = { path: TerrainWithKey[]; unit: Unit };
 
@@ -36,7 +37,10 @@ export default class UnitBehaviorService {
     this.gameManager = gameManager;
   }
 
-  process() {}
+  process() {
+    this.behaviorHandler();
+    return this.actionQueue;
+  }
 
   get behaviorHandler() {
     switch (this.behavior) {
@@ -51,11 +55,8 @@ export default class UnitBehaviorService {
       case "THIEF":
         return this.handleThiefBehavior;
       default:
+        return this.handleStationaryBehavior;
     }
-  }
-
-  get pathfinder() {
-    return this.battleManager.mapManager.pathfinders[this.unit.name];
   }
 
   get hostileUnits() {
@@ -80,26 +81,10 @@ export default class UnitBehaviorService {
       : enemyUnits;
   }
 
-  getPathToNearestHostileUnit() {
-    return this.hostileUnits.reduce(
-      (acc, hostileUnit) => {
-        const path = this.pathfinder.getPathTo({
-          start: this.pathfinder.currentCoordinates,
-          end: hostileUnit.coordinates
-        });
-        if (acc === null || path.length < acc.path.length) {
-          return { path, unit: hostileUnit.unit };
-        }
-        return acc;
-      },
-      null as PathToUnit
-    );
-  }
-
   handleStationaryBehavior() {}
 
   handleActiveBehavior() {
-    const pathToNearestHostileUnit = this.getPathToNearestHostileUnit();
+    const { pathToNearestHostileUnit } = this;
     if (pathToNearestHostileUnit) {
       const { path, unit } = pathToNearestHostileUnit;
       this.actionQueue.push({ type: "UNIT_MOVEMENT", payload: { path, unit } });
@@ -115,5 +100,39 @@ export default class UnitBehaviorService {
     if (chests.filter(({ isOpened }) => !isOpened).length < 1) {
       return this.handleActiveBehavior();
     }
+  }
+
+  private goTowardsNearestUnit() {
+    const { pathToNearestHostileUnit } = this;
+    if (pathToNearestHostileUnit) {
+      const { path, unit } = pathToNearestHostileUnit;
+      this.actionQueue.push({ type: "UNIT_MOVEMENT", payload: { path, unit } });
+    }
+  }
+
+  private get pathToNearestHostileUnit() {
+    return this.hostileUnits.reduce(
+      (acc, hostileUnit) => {
+        // const manhattanDistance = getManhattanDistance(
+        //   hostileUnit.coordinates,
+        //   this.pathfinder.currentCoordinates
+        // );
+        // // prevent large maps from processing extra paths
+        // // tradeoff is units further away are less likely to move
+        // if (manhattanDistance > this.pathfinder.unit.stats.movement * 3) {
+        //   return acc;
+        // }
+
+        // const path = this.pathfinder.getPathTo({
+        //   start: this.pathfinder.currentCoordinates,
+        //   end: hostileUnit.coordinates
+        // });
+        // if (acc === null || path.length < acc.path.length) {
+        //   return { path, unit: hostileUnit.unit };
+        // }
+        return acc;
+      },
+      null as PathToUnit
+    );
   }
 }

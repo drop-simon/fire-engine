@@ -1,19 +1,30 @@
-import { WeaponType, CombatCategory, Unit } from "../../types";
-import { increaseStats } from "../utils";
-import GameManagementService from "../GameManagementService";
+import { WeaponType, Unit, UnitAllegiance } from "../../../types";
+import { increaseStats } from "../../utils";
+import GameManagementService from "../../GameManagementService";
+import MapManagementService from "../../MapManagementService";
+import { UnitCoordinates } from "../../UnitPathfindingService";
 
-interface BattleUnitManagementServiceConfig {
-  unit: Unit;
+interface UnitManagementServiceConfig {
+  unitCoordinates: UnitCoordinates;
   gameManager: GameManagementService;
+  mapManager: MapManagementService;
 }
 
-export default class BattleUnitManagementService {
+export default class UnitManagementService {
   unit: Unit;
+  allegiance: UnitAllegiance;
   gameManager: GameManagementService;
+  mapManager: MapManagementService;
 
-  constructor({ unit, gameManager }: BattleUnitManagementServiceConfig) {
+  constructor({
+    unitCoordinates: { unit, allegiance },
+    gameManager,
+    mapManager
+  }: UnitManagementServiceConfig) {
     this.unit = unit;
+    this.allegiance = allegiance;
     this.gameManager = gameManager;
+    this.mapManager = mapManager;
   }
 
   levelUp() {
@@ -52,6 +63,13 @@ export default class BattleUnitManagementService {
     );
   }
 
+  get equippedSpecialty() {
+    if (!this.equippedWeapon) {
+      return null;
+    }
+    return this.equippedWeapon.specialty;
+  }
+
   get conflictStats() {
     return {
       attackPower: this.attackPower,
@@ -60,8 +78,7 @@ export default class BattleUnitManagementService {
       avoid: this.avoid,
       critical: this.critical,
       criticalAvoid: this.criticalAvoid,
-      staffAccuracy: this.staffAccuracy,
-      staffAvoid: this.staffAvoid
+      staffAccuracy: this.staffAccuracy
     };
   }
 
@@ -104,11 +121,6 @@ export default class BattleUnitManagementService {
   private get avoid() {
     return this.attackSpeed * 2 + this.unit.stats.luck;
     // = (Attack Speed x 2) + Luck + Support bonus + Terrain bonus + Tactician bonus
-  }
-
-  private get staffAvoid() {
-    return this.unit.stats.resistance * 5;
-    // = (Resistance x 5) + (Distance from enemy x 2)
   }
 
   private get critical() {

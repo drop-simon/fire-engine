@@ -10,7 +10,7 @@ import {
 } from ".";
 import { Item, CombatCategory, WeaponSpecialty } from ".";
 import UnitCreationService from "../services/UnitCreationService";
-import BattleUnitManagementService from "../services/BattleManagementService/BattleUnitManagementService";
+import UnitManagementService from "../services/BattleManagementService/UnitManagementService";
 
 export type PhysicalUnitClassName =
   | "Archer"
@@ -182,9 +182,9 @@ export type AnyUnit = UnitConfig<CombatCategory>;
 
 export type Unit = ReturnType<UnitCreationService<CombatCategory>["process"]>;
 
-export type BattleManagedUnit = BattleUnitManagementService;
+export type ManagedUnit = UnitManagementService;
 
-export type UnitDependantFunction<T extends any> = (unit?: Unit) => T;
+export type UnitDependantFunction<T extends any> = (unit: Unit) => T;
 
 export type UnitAllegiance = "PLAYER" | "ENEMY" | "NEUTRAL";
 

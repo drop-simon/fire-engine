@@ -2,10 +2,14 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { Unit, Terrain, UnitAllegiance } from "../../types";
-import MapManagementService, { MapConfigType } from "../MapManagementService";
-import { getMapSize } from "../utils";
-import GameManagementService from "../GameManagementService";
+import { Unit, TerrainConfig, UnitAllegiance } from "../types";
+import MapManagementService, {
+  MapConfigType,
+  MapTileInformation
+} from "./MapManagementService";
+import { getMapSize } from "./utils";
+import GameManagementService from "./GameManagementService";
+import UnitManagementService from "./BattleManagementService/UnitManagementService";
 
 export type Coordinates = {
   x: number;
@@ -18,7 +22,7 @@ export type UnitCoordinates = {
   allegiance: UnitAllegiance;
 };
 
-export interface TerrainWithKey extends Terrain {
+export interface TerrainWithKey extends TerrainConfig {
   key: string;
   coordinates: Coordinates;
 }
@@ -44,30 +48,33 @@ type GetPathTo = (args: {
   start: Coordinates;
   end: Coordinates;
   uninterrupted?: boolean;
-}) => TerrainWithKey[];
+}) => MapTileInformation[];
 
 export default class UnitPathfindingService {
   gameManager: GameManagementService;
   mapManager: MapManagementService;
-  unit: Unit;
+  unitManager: UnitManagementService;
+  allegiance: UnitAllegiance;
   currentCoordinates: Coordinates;
-  processedTiles: TerrainWithKey[] = [];
-  tileMap = new Map<string, TerrainWithKey>();
+  processedTiles: MapTileInformation[] = [];
+  tileMap = new Map<string, MapTileInformation>();
   graph = new Graph();
 
   constructor({
     mapManager,
     gameManager,
-    unitCoordinates
+    coordinates,
+    unitManager
   }: {
     gameManager: GameManagementService;
     mapManager: MapManagementService;
-    unitCoordinates: UnitCoordinates;
+    unitManager: UnitManagementService;
+    coordinates: Coordinates;
   }) {
     this.gameManager = gameManager;
     this.mapManager = mapManager;
-    this.currentCoordinates = unitCoordinates.coordinates;
-    this.unit = unitCoordinates.unit;
+    this.currentCoordinates = coordinates;
+    this.unitManager = unitManager;
 
     mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
@@ -85,7 +92,7 @@ export default class UnitPathfindingService {
 
   private get nonTraversableTiles() {
     return this.processedTiles
-      .filter(tile => tile.movementCost === Infinity)
+      .filter(tile => tile.terrain.calculated.movementCost === Infinity)
       .map(tile => tile.key);
   }
 
@@ -100,19 +107,21 @@ export default class UnitPathfindingService {
       return [];
     }
 
-    let stepsLeft = uninterrupted ? Infinity : this.unit.stats.movement;
+    let stepsLeft = uninterrupted
+      ? Infinity
+      : this.unitManager.unit.stats.movement;
 
     const mappedPath = path.slice(1).reduce(
       (mappedPath, key) => {
         const node = this.tileMap.get(key);
-        if (node.movementCost > stepsLeft) {
+        if (node.terrain.calculated.movementCost > stepsLeft) {
           stepsLeft = 0;
           return mappedPath;
         }
-        stepsLeft -= node.movementCost;
+        stepsLeft -= node.terrain.calculated.movementCost;
         return mappedPath.concat(node);
       },
-      [] as TerrainWithKey[]
+      [] as MapTileInformation[]
     );
 
     return mappedPath;
@@ -160,7 +169,7 @@ export default class UnitPathfindingService {
         acc.push(...path);
         return acc;
       },
-      [] as TerrainWithKey[]
+      [] as MapTileInformation[]
     );
     return uniqBy(walkableTiles, "key");
   }
@@ -172,8 +181,12 @@ export default class UnitPathfindingService {
       )
     );
 
+  compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
+    return this.createTileKey(coordsA) === this.createTileKey(coordsB);
+  }
+
   private getFullMovementRange() {
-    const { movement } = this.unit.stats;
+    const { movement } = this.unitManager.unit.stats;
     const { currentCoordinates } = this;
 
     const coordinates = range(-movement, movement + 1).reduce(
@@ -201,20 +214,11 @@ export default class UnitPathfindingService {
     return !(outOfBoundsX || outOfBoundsY);
   };
 
-  private getTile({ x, y }: Coordinates): TerrainWithKey {
-    const row = this.mapManager.map.terrain[y];
-    if (!row) {
-      return null;
-    }
-    const terrainCreator = row[x];
-    if (!terrainCreator) {
-      return null;
-    }
-    return {
-      ...terrainCreator(this.unit),
-      key: this.createTileKey({ x, y }),
-      coordinates: { x, y }
-    };
+  private getTile({ x, y }: Coordinates) {
+    return this.mapManager.getTileInfo({
+      coordinates: { x, y },
+      unit: this.unitManager.unit
+    });
   }
 
   private createDijkstraNode = (coordinates: Coordinates) => {
@@ -226,7 +230,7 @@ export default class UnitPathfindingService {
     const dijkstraNode = {
       ...adjacentTiles.reduce(
         (acc, tile) => {
-          acc[tile.key] = tile.movementCost;
+          acc[tile.key] = tile.terrain.calculated.movementCost;
           return acc;
         },
         {} as { [key: string]: number }
@@ -235,5 +239,5 @@ export default class UnitPathfindingService {
     return { value: dijkstraNode, key: tile.key };
   };
 
-  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
+  private createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 }

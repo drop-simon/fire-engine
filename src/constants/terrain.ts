@@ -1,7 +1,7 @@
-import { TerrainCreator } from "../types/terrain";
-import UnitPathfindingService from "../services/BattleManagementService/UnitPathfindingService";
+import { TerrainConfig } from "../types/terrain";
+import { Unit } from "../types";
 
-const createVoidLikeTileCreator = (name: string): TerrainCreator => () => ({
+const createVoidLikeTile = (name: string): TerrainConfig => ({
   name,
   movementCost: Infinity,
   effects: {
@@ -12,17 +12,18 @@ const createVoidLikeTileCreator = (name: string): TerrainCreator => () => ({
     ongoing: {
       health: 0
     }
-  }
+  },
+  getUnitModifications: () => ({})
 });
-const VOID_LIKE_TERRAIN_CREATORS = {
-  Void: createVoidLikeTileCreator("void"),
-  Wall: createVoidLikeTileCreator("wall"),
-  BuildingSpace: createVoidLikeTileCreator("building space")
+const VOID_LIKE_TERRAIN = {
+  Void: createVoidLikeTile("void"),
+  Wall: createVoidLikeTile("wall"),
+  BuildingSpace: createVoidLikeTile("building space")
 } as const;
 
-const createGapLikeTileCreator = (name: string): TerrainCreator => unit => ({
+const createGapLikeTile = (name: string): TerrainConfig => ({
   name,
-  movementCost: unit && unit.base.flying ? 1 : Infinity,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 0,
@@ -31,17 +32,19 @@ const createGapLikeTileCreator = (name: string): TerrainCreator => unit => ({
     ongoing: {
       health: 0
     }
-  }
+  },
+  getUnitModifications: ({ base: { flying } }: Unit) =>
+    flying ? { movementCost: 1 } : {}
 });
-const GAP_LIKE_TERRAIN_CREATORS = {
-  Gap: createGapLikeTileCreator("gap"),
-  Thicket: createGapLikeTileCreator("thicket"),
-  Cliff: createGapLikeTileCreator("cliff"),
-  Fence: createGapLikeTileCreator("fence"),
-  Snag: createGapLikeTileCreator("snag")
+const GAP_LIKE_TERRAIN = {
+  Gap: createGapLikeTile("gap"),
+  Thicket: createGapLikeTile("thicket"),
+  Cliff: createGapLikeTile("cliff"),
+  Fence: createGapLikeTile("fence"),
+  Snag: createGapLikeTile("snag")
 };
 
-const createFloorLikeTileCreator = (name: string): TerrainCreator => () => ({
+const createFloorLikeTile = (name: string): TerrainConfig => ({
   name,
   movementCost: 1,
   effects: {
@@ -52,16 +55,17 @@ const createFloorLikeTileCreator = (name: string): TerrainCreator => () => ({
     ongoing: {
       health: 0
     }
-  }
+  },
+  getUnitModifications: () => ({})
 });
-const FLOOR_LIKE_TERRAIN_CREATORS = {
-  Floor: createFloorLikeTileCreator("floor"),
-  Plain: createFloorLikeTileCreator("plains"),
-  Chest: createFloorLikeTileCreator("chest"),
-  Bridge: createFloorLikeTileCreator("bridge")
+const FLOOR_LIKE_TERRAIN = {
+  Floor: createFloorLikeTile("floor"),
+  Plain: createFloorLikeTile("plains"),
+  Chest: createFloorLikeTile("chest"),
+  Bridge: createFloorLikeTile("bridge")
 } as const;
 
-const createVillageLikeTileCreator = (name: string): TerrainCreator => () => ({
+const createVillageLikeTile = (name: string): TerrainConfig => ({
   name,
   movementCost: 1,
   effects: {
@@ -72,19 +76,20 @@ const createVillageLikeTileCreator = (name: string): TerrainCreator => () => ({
     ongoing: {
       health: 0
     }
-  }
+  },
+  getUnitModifications: () => ({})
 });
-const VILLAGE_LIKE_TERRAIN_CREATORS = {
-  Village: createVillageLikeTileCreator("village"),
-  Armory: createVillageLikeTileCreator("armory"),
-  Vendor: createVillageLikeTileCreator("vendor"),
-  Arena: createVillageLikeTileCreator("arena"),
-  Stairs: createVillageLikeTileCreator("stairs")
+const VILLAGE_LIKE_TERRAIN = {
+  Village: createVillageLikeTile("village"),
+  Armory: createVillageLikeTile("armory"),
+  Vendor: createVillageLikeTile("vendor"),
+  Arena: createVillageLikeTile("arena"),
+  Stairs: createVillageLikeTile("stairs")
 } as const;
 
-const Ballista: TerrainCreator = unit => ({
+const Ballista: TerrainConfig = {
   name: "ballista",
-  movementCost: unit && unit.base.flying ? 1 : 2,
+  movementCost: 2,
   effects: {
     static: {
       defense: 0,
@@ -93,12 +98,14 @@ const Ballista: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ base: { flying } }: Unit) =>
+    flying ? { movementCost: 1 } : {}
+};
 
-const Forest: TerrainCreator = unit => ({
+const Forest: TerrainConfig = {
   name: "forest",
-  movementCost: !unit ? 2 : unit.base.flying ? 1 : unit.base.horseback ? 3 : 2,
+  movementCost: 2,
   effects: {
     static: {
       defense: 1,
@@ -107,18 +114,14 @@ const Forest: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ base: { flying, horseback } }: Unit) =>
+    flying ? { movementCost: 1 } : horseback ? { movementCost: 3 } : {}
+};
 
-const Pillar: TerrainCreator = unit => ({
+const Pillar: TerrainConfig = {
   name: "pillar",
-  movementCost: !unit
-    ? 2
-    : unit.base.flying
-    ? 1
-    : unit.base.horseback || unit.base.armored
-    ? 3
-    : 2,
+  movementCost: 2,
   effects: {
     static: {
       defense: 1,
@@ -127,8 +130,14 @@ const Pillar: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ base: { flying, horseback, armored } }: Unit) =>
+    flying
+      ? { movementCost: 1 }
+      : horseback || armored
+      ? { movementCost: 3 }
+      : {}
+};
 
 const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
   "Fighter",
@@ -136,14 +145,9 @@ const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
   "Berserker",
   "Pirate"
 ];
-const Mountain: TerrainCreator = unit => ({
+const Mountain: TerrainConfig = {
   name: "mountain",
-  movementCost:
-    !unit || !MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
-      ? Infinity
-      : unit.base.flying
-      ? 1
-      : 4,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 2,
@@ -152,17 +156,18 @@ const Mountain: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ name, base: { flying } }: Unit) =>
+    MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
+      ? { movementCost: 4 }
+      : flying
+      ? { movementCost: 1 }
+      : {}
+};
 
-const Peak: TerrainCreator = unit => ({
+const Peak: TerrainConfig = {
   name: "peak",
-  movementCost:
-    !unit || !MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
-      ? Infinity
-      : unit.base.flying
-      ? 1
-      : 4,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 2,
@@ -171,10 +176,16 @@ const Peak: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ name, base: { flying } }: Unit) =>
+    MOUNTAIN_TRAVERSABLE_UNITS.includes(name)
+      ? { movementCost: 4 }
+      : flying
+      ? { movementCost: 1 }
+      : {}
+};
 
-const Gate: TerrainCreator = unit => ({
+const Gate: TerrainConfig = {
   name: "gate",
   movementCost: 1,
   effects: {
@@ -183,12 +194,15 @@ const Gate: TerrainCreator = unit => ({
       avoid: 20
     },
     ongoing: {
-      health: unit ? Math.round(unit.stats.health / 10) : 0
+      health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ stats: { health } }: Unit) => ({
+    effects: { ongoing: { health: Math.round(health / 10) } }
+  })
+};
 
-const Throne: TerrainCreator = unit => ({
+const Throne: TerrainConfig = {
   name: "throne",
   movementCost: 1,
   effects: {
@@ -197,20 +211,16 @@ const Throne: TerrainCreator = unit => ({
       avoid: 30
     },
     ongoing: {
-      health: unit ? Math.round(unit.stats.health / 10) : 0
+      health: 0
     }
-  }
-});
+  },
+  getUnitModifications: Gate.getUnitModifications
+};
 
 const WATER_TRAVERSABLE_UNITS: string[] = ["Berserker", "Pirate"];
-const Sea: TerrainCreator = unit => ({
+const Sea: TerrainConfig = {
   name: "sea",
-  movementCost:
-    !unit || !WATER_TRAVERSABLE_UNITS.includes(unit.base.name)
-      ? Infinity
-      : unit.base.flying
-      ? 1
-      : 2,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 0,
@@ -219,17 +229,18 @@ const Sea: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ name, base: { flying } }: Unit) =>
+    WATER_TRAVERSABLE_UNITS.includes(name)
+      ? { movementCost: 2 }
+      : flying
+      ? { movementCost: 1 }
+      : {}
+};
 
-const Lake: TerrainCreator = unit => ({
+const Lake: TerrainConfig = {
   name: "lake",
-  movementCost:
-    !unit || !WATER_TRAVERSABLE_UNITS.includes(unit.base.name)
-      ? Infinity
-      : unit.base.flying
-      ? 1
-      : 3,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 0,
@@ -238,12 +249,18 @@ const Lake: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ name, base: { flying } }: Unit) =>
+    WATER_TRAVERSABLE_UNITS.includes(name)
+      ? { movementCost: 3 }
+      : flying
+      ? { movementCost: 1 }
+      : {}
+};
 
-const Fort: TerrainCreator = unit => ({
+const Fort: TerrainConfig = {
   name: "fort",
-  movementCost: unit && unit.base.flying ? 1 : 2,
+  movementCost: 2,
   effects: {
     static: {
       defense: 0,
@@ -252,60 +269,54 @@ const Fort: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
-
-const Desert: TerrainCreator = unit => {
-  const movementCost = unit
-    ? unit.base.horseback
-      ? 4
-      : unit.base.category === "Magic"
-      ? 1
-      : 2
-    : 2;
-
-  return {
-    name: "desert",
-    movementCost,
-    effects: {
-      static: {
-        defense: 0,
-        avoid: 5
-      },
-      ongoing: {
-        health: 0
-      }
-    }
-  };
+  },
+  getUnitModifications: ({ base: { flying } }: Unit) =>
+    flying ? { movementCost: 1 } : {}
 };
 
-const River: TerrainCreator = unit => {
-  const movementCost = unit
-    ? unit.base.name === "Pirate"
-      ? 2
+const Desert: TerrainConfig = {
+  name: "desert",
+  movementCost: 2,
+  effects: {
+    static: {
+      defense: 0,
+      avoid: 5
+    },
+    ongoing: {
+      health: 0
+    }
+  },
+  getUnitModifications: ({ base: { category, horseback } }) =>
+    category === "Magic"
+      ? { movementCost: 2 }
+      : horseback
+      ? { movementCost: 4 }
+      : {}
+};
+
+const River: TerrainConfig = {
+  name: "river",
+  movementCost: Infinity,
+  effects: {
+    static: {
+      defense: 0,
+      avoid: 5
+    },
+    ongoing: {
+      health: 0
+    }
+  },
+  getUnitModifications: unit =>
+    unit.base.name === "Pirate"
+      ? { movementCost: 2 }
       : !unit.base.horseback || unit.base.promotions.length === 0
-      ? 5
-      : Infinity
-    : Infinity;
-
-  return {
-    name: "river",
-    movementCost,
-    effects: {
-      static: {
-        defense: 0,
-        avoid: 5
-      },
-      ongoing: {
-        health: 0
-      }
-    }
-  };
+      ? { movementCost: 5 }
+      : {}
 };
 
-const Cliff: TerrainCreator = unit => ({
+const Cliff: TerrainConfig = {
   name: "cliff",
-  movementCost: unit && unit.base.flying ? 1 : Infinity,
+  movementCost: Infinity,
   effects: {
     static: {
       defense: 0,
@@ -314,12 +325,14 @@ const Cliff: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ base: { flying } }: Unit) =>
+    flying ? { movementCost: 1 } : {}
+};
 
-const Ruins: TerrainCreator = unit => ({
+const Ruins: TerrainConfig = {
   name: "ruins",
-  movementCost: unit && unit.base.flying ? 1 : 2,
+  movementCost: 2,
   effects: {
     static: {
       defense: 0,
@@ -328,10 +341,12 @@ const Ruins: TerrainCreator = unit => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: ({ base: { flying } }: Unit) =>
+    flying ? { movementCost: 1 } : {}
+};
 
-const Sand: TerrainCreator = () => ({
+const Sand: TerrainConfig = {
   name: "sand",
   movementCost: 1,
   effects: {
@@ -342,14 +357,15 @@ const Sand: TerrainCreator = () => ({
     ongoing: {
       health: 0
     }
-  }
-});
+  },
+  getUnitModifications: () => ({})
+};
 
 export const Terrain = {
-  ...VOID_LIKE_TERRAIN_CREATORS,
-  ...GAP_LIKE_TERRAIN_CREATORS,
-  ...FLOOR_LIKE_TERRAIN_CREATORS,
-  ...VILLAGE_LIKE_TERRAIN_CREATORS,
+  ...VOID_LIKE_TERRAIN,
+  ...GAP_LIKE_TERRAIN,
+  ...FLOOR_LIKE_TERRAIN,
+  ...VILLAGE_LIKE_TERRAIN,
   Ballista,
   Lake,
   River,
