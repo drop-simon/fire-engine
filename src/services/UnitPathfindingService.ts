@@ -2,13 +2,18 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { TerrainConfig, UnitAllegiance } from "../types";
+import { TerrainConfig, UnitAllegiance, WeaponType, Unit } from "../types";
 import MapManagementService, {
   MapTileInformation
 } from "./MapManagementService";
-import { getMapDimensions } from "./utils";
+import {
+  getMapDimensions,
+  getManhattanDistance,
+  getTargetableTiles
+} from "./utils";
 import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
+import merge from "lodash/merge";
 
 export type Coordinates = {
   x: number;
@@ -72,7 +77,7 @@ export default class UnitPathfindingService {
     mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
-        const tile = this.getTile({ x, y });
+        const tile = this.getTileInfo({ coordinates: { x, y } });
         if (!node || !tile) {
           return;
         }
@@ -144,7 +149,7 @@ export default class UnitPathfindingService {
     });
   };
 
-  getWalkableTiles() {
+  get walkableTiles() {
     const fullMovementRange = this.getFullMovementRange();
     const walkableTiles = fullMovementRange.reduce(
       (acc, coordinates) => {
@@ -170,12 +175,73 @@ export default class UnitPathfindingService {
   getAdjacentTiles = (coordinates: Coordinates) =>
     compact(
       ADJACENT_TILE_INDICES.map(({ x, y }) =>
-        this.getTile({ x: coordinates.x + x, y: coordinates.y + y })
+        this.getTileInfo({
+          coordinates: { x: coordinates.x + x, y: coordinates.y + y }
+        })
       )
     );
 
   compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
     return this.createTileKey(coordsA) === this.createTileKey(coordsB);
+  }
+
+  get conflictRange() {
+    return this.getFullRangeFromWeapons(
+      this.unitManager.equippableWeapons.filter(weapon => !weapon.friendly)
+    );
+  }
+
+  get friendlyFireRange() {
+    return this.getFullRangeFromWeapons(
+      this.unitManager.equippableWeapons.filter(weapon => weapon.friendly)
+    );
+  }
+
+  getFullRangeFromWeapons(weapons: WeaponType[]) {
+    const tiles = weapons.reduce(
+      (acc, weapon) => acc.concat(this.getFullRangeFromWeapon(weapon)),
+      [] as MapTileInformation[]
+    );
+    return uniqBy(tiles, "key");
+  }
+
+  getFullRangeFromWeapon(weapon: WeaponType) {
+    const [min, max] = weapon.range;
+    const allTiles = this.getMapInfo(this.unitManager.unit);
+    const targetableTiles = this.walkableTiles.reduce(
+      (acc, currentTile) => {
+        const tiles = getTargetableTiles({
+          origin: currentTile,
+          tiles: allTiles,
+          weaponRange: [min, max]
+        });
+        return acc.concat(tiles);
+      },
+      [] as MapTileInformation[]
+    );
+    return uniqBy(targetableTiles, "key");
+  }
+
+  getRangeFromWeapon(weapon: WeaponType, tile: MapTileInformation) {
+    const [min, max] = weapon.range;
+    const allTiles = this.getMapInfo(this.unitManager.unit);
+    return getTargetableTiles({
+      origin: tile,
+      tiles: allTiles,
+      weaponRange: [min, max]
+    });
+  }
+
+  getMapInfo(unit?: Unit) {
+    return this.mapManager.map.terrain.reduce(
+      (tiles, row, x) => {
+        row.forEach((_, y) =>
+          tiles.push(this.getTileInfo({ coordinates: { x, y } }))
+        );
+        return tiles;
+      },
+      [] as MapTileInformation[]
+    );
   }
 
   private getFullMovementRange() {
@@ -207,15 +273,37 @@ export default class UnitPathfindingService {
     return !(outOfBoundsX || outOfBoundsY);
   };
 
-  private getTile({ x, y }: Coordinates) {
-    return this.mapManager.getTileInfo({
-      coordinates: { x, y },
-      unit: this.unitManager.unit
-    });
+  private getTileInfo({ coordinates: { x, y } }: { coordinates: Coordinates }) {
+    const row = this.mapManager.map.terrain[y];
+    if (!row) {
+      return null;
+    }
+    const terrainConfig = row[x];
+    if (!terrainConfig) {
+      return null;
+    }
+
+    const { getUnitModifications, ...baseTerrain } = terrainConfig;
+    const mapManagedUnit = this.mapManager.getUnitAtCoordinates({ x, y });
+
+    return {
+      terrain: {
+        base: baseTerrain,
+        calculated: mapManagedUnit
+          ? merge(
+              baseTerrain,
+              getUnitModifications(mapManagedUnit.unitManager.unit)
+            )
+          : null
+      },
+      unit: mapManagedUnit,
+      key: this.createTileKey({ x, y }),
+      coordinates: { x, y }
+    };
   }
 
   private createDijkstraNode = (coordinates: Coordinates) => {
-    const tile = this.getTile(coordinates);
+    const tile = this.getTileInfo({ coordinates });
     if (!tile) {
       return null;
     }

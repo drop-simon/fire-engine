@@ -41,6 +41,7 @@ export interface WeaponConfigType<C extends CombatCategory> extends ItemBase {
   subcategory: C;
   name: string;
   specialty: WeaponSpecialty<C>;
+  friendly?: boolean;
   level: C extends "Special" ? null : WeaponLevelType;
   description?: string;
   effects?: WeaponEffectType;

@@ -186,9 +186,4 @@ export type UnitDependantFunction<T extends any> = (unit: Unit) => T;
 
 export type UnitAllegiance = "PLAYER" | "ENEMY" | "NEUTRAL";
 
-export type UnitBehavior =
-  | "STATIONARY"
-  | "PASSIVE"
-  | "ACTIVE"
-  | "SUPPORT"
-  | "THIEF";
+export type UnitBehavior = "STATIONARY" | "PASSIVE" | "ACTIVE";

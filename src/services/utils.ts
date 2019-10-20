@@ -1,5 +1,5 @@
 import { StatListType, StatGrowthRateListType } from "../types";
-import { MapConfigType } from "./MapManagementService";
+import { MapConfigType, MapTileInformation } from "./MapManagementService";
 import { Coordinates } from "./UnitPathfindingService";
 
 // probability is a float between 0 and 1
@@ -38,4 +38,20 @@ export const getManhattanDistance = (
   const xDistance = Math.abs(coordsA.x - coordsB.x);
   const yDistance = Math.abs(coordsA.y - coordsB.y);
   return xDistance + yDistance;
+};
+
+export const getTargetableTiles = ({
+  tiles,
+  origin,
+  weaponRange
+}: {
+  tiles: MapTileInformation[];
+  origin: MapTileInformation;
+  weaponRange: [number, number];
+}) => {
+  const [min, max] = weaponRange;
+  return tiles.filter(tile => {
+    const distance = getManhattanDistance(origin.coordinates, tile.coordinates);
+    return distance <= max && distance >= min;
+  });
 };

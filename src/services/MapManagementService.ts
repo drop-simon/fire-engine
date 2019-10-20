@@ -1,9 +1,5 @@
-import merge from "lodash/merge";
-import UnitPathfindingService, {
-  Coordinates,
-  TerrainWithKey
-} from "./UnitPathfindingService";
-import { TerrainConfig, Unit, UnitAllegiance } from "../types";
+import UnitPathfindingService, { Coordinates } from "./UnitPathfindingService";
+import { TerrainConfig } from "../types";
 import GameManagementService from "./GameManagementService";
 import { getMapDimensions } from "./utils";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
@@ -14,7 +10,7 @@ export type MapConfigType = {
 };
 
 export type MapTileInformation = ReturnType<
-  MapManagementService["getTileInfo"]
+  UnitPathfindingService["getTileInfo"]
 >;
 
 export interface MapManagementServiceConstructor {
@@ -84,47 +80,4 @@ export default class MapManagementService {
       pathfinder.compareCoordinates(pathfinder.currentCoordinates, coordinates)
     );
   }
-
-  getTileInfo({
-    coordinates: { x, y },
-    unit = undefined
-  }: {
-    coordinates: Coordinates;
-    unit?: Unit;
-  }) {
-    const row = this.map.terrain[y];
-    if (!row) {
-      return null;
-    }
-    const terrainConfig = row[x];
-    if (!terrainConfig) {
-      return null;
-    }
-
-    const { getUnitModifications, ...baseTerrain } = terrainConfig;
-
-    return {
-      terrain: {
-        base: baseTerrain,
-        calculated: unit ? merge(baseTerrain, getUnitModifications(unit)) : null
-      },
-      unit,
-      key: this.createTileKey({ x, y }),
-      coordinates: { x, y }
-    };
-  }
-
-  getMapTileInfo(unit?: Unit) {
-    return this.map.terrain.reduce(
-      (tiles, row, x) => {
-        row.forEach((_, y) =>
-          tiles.push(this.getTileInfo({ coordinates: { x, y }, unit }))
-        );
-        return tiles;
-      },
-      [] as MapTileInformation[]
-    );
-  }
-
-  createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 }

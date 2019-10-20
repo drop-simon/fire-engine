@@ -63,41 +63,28 @@ export default class UnitManagementService {
     return this;
   }
 
-  canEquipWeapon = (weapon: WeaponType) =>
+  getCanEquipWeapon = (weapon: WeaponType) =>
     this.unit.weaponLevels.some(
       ({ specialty, level }) =>
         specialty == weapon.specialty && level <= weapon.level
     );
 
+  get items() {
+    return this.unit.items;
+  }
+
   get weapons() {
-    return this.unit.items.filter(
+    return this.items.filter(
       ({ category }) => category === "Weapon"
     ) as WeaponType[];
   }
 
   get equippableWeapons() {
-    return this.weapons.filter(this.canEquipWeapon);
+    return this.weapons.filter(this.getCanEquipWeapon);
   }
 
   get equippedWeapon() {
-    return this.weapons.find(this.canEquipWeapon);
-  }
-
-  get attackRange() {
-    return this.equippableWeapons.reduce(
-      (acc, weapon) => {
-        if (weapon.range[0] < acc[0]) {
-          acc[0] = weapon.range[0];
-        }
-
-        if (weapon.range[1] > acc[1]) {
-          acc[1] = weapon.range[1];
-        }
-
-        return acc;
-      },
-      [Infinity, -Infinity] as WeaponType["range"]
-    );
+    return this.weapons.find(this.getCanEquipWeapon);
   }
 
   get equippedSpecialty() {

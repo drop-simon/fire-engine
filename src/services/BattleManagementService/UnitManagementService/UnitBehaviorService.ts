@@ -1,20 +1,13 @@
 import sortBy from "lodash/sortBy";
-import range from "lodash/range";
 import { UnitAllegiance, UnitBehavior } from "../../../types";
 import BattleManagementService from "..";
 import GameManagementService from "../../GameManagementService";
-import { getManhattanDistance } from "../../utils";
+import { getManhattanDistance, getTargetableTiles } from "../../utils";
 import { MapManagedUnit, MapTileInformation } from "../../MapManagementService";
 import { Coordinates } from "../../UnitPathfindingService";
-import EventEmitterService from "../../EventEmitterService";
 import ConflictProcessingService from "../../ConflictProcessingService";
 
-type PathToUnit = { path: MapTileInformation[]; unit: MapManagedUnit };
-
-interface UnitBehaviorServiceConstructor
-  extends EventEmitterService<{
-    movement: (path: MapTileInformation[]) => void;
-  }> {
+interface UnitBehaviorServiceConstructor {
   mapManagedUnit: MapManagedUnit;
   allegiance: Exclude<UnitAllegiance, "PLAYER">;
   behavior: UnitBehavior;
@@ -58,10 +51,6 @@ export default class UnitBehaviorService {
         return this.handlePassiveBehavior;
       case "STATIONARY":
         return this.handleStationaryBehavior;
-      case "SUPPORT":
-        return this.handleSupportBehavior;
-      case "THIEF":
-        return this.handleThiefBehavior;
       default:
         return this.handleStationaryBehavior;
     }
@@ -79,50 +68,65 @@ export default class UnitBehaviorService {
     return this.mapManagedUnit.pathfinder;
   }
 
-  get unit() {
+  get unitManager() {
     return this.mapManagedUnit.unitManager;
   }
 
   handleStationaryBehavior() {
-    const targetableTiles = this.getTargetableTilesFromCoordinates(
-      this.pathfinder.currentCoordinates
-    );
-    const hostileUnit = this.hostileUnits.find(hostileUnit =>
-      targetableTiles.some(({ coordinates }) =>
-        this.pathfinder.compareCoordinates(
-          coordinates,
-          hostileUnit.pathfinder.currentCoordinates
-        )
-      )
-    );
-    if (hostileUnit) {
-      const result = new ConflictProcessingService({
-        aggressor: this.mapManagedUnit,
-        defender: hostileUnit
-      }).process();
-      this.eventQueue.push({
-        eventName: "conflict",
-        payload: result
-      });
+    if (this.unitManager.weapons.length < 1) {
+      this.handleSupportBehavior();
       return true;
     }
-    return false;
-  }
 
-  handleActiveBehavior() {
-    const didHandleStationaryBehavior = this.handleStationaryBehavior();
-    if (didHandleStationaryBehavior) {
+    const targetableTiles = this.pathfinder.conflictRange;
+    const targetableUnits = targetableTiles.reduce(
+      (acc, tile) => {
+        if (!tile.unit) {
+          return acc;
+        }
+        const { allegiance } = tile.unit.unitManager;
+        const canTarget =
+          (this.allegiance === "NEUTRAL" && allegiance === "ENEMY") ||
+          (this.allegiance === "ENEMY" && allegiance !== "ENEMY");
+        if (canTarget) {
+          acc.push(tile.unit);
+        }
+        return acc;
+      },
+      [] as MapManagedUnit[]
+    );
+
+    const target = targetableUnits[0];
+    if (!target) {
       return false;
     }
 
-    const { attackTilesByProximity } = this;
+    const result = new ConflictProcessingService({
+      aggressor: this.mapManagedUnit,
+      defender: target
+    }).process();
+    this.eventQueue.push({
+      eventName: "conflict",
+      payload: result
+    });
+    return true;
+  }
+
+  handleActiveBehavior() {
+    if (this.handleStationaryBehavior()) {
+      return false;
+    }
+
+    const attackTilesByProximity = sortBy(this.pathfinder.conflictRange, tile =>
+      this.getDistanceFromUnit(tile.coordinates)
+    );
     if (attackTilesByProximity.length < 1) {
       return false;
     }
 
     const [firstTile] = attackTilesByProximity;
     const closestPath = attackTilesByProximity.reduce((path, tile) => {
-      if (path.length <= this.unit.unit.stats.movement) {
+      if (path.length <= this.unitManager.unit.stats.movement) {
         return path;
       }
       const possiblePath = this.getPathToTile(tile.coordinates);
@@ -133,19 +137,49 @@ export default class UnitBehaviorService {
     }, this.getPathToTile(firstTile.coordinates));
 
     this.eventQueue.push({ type: "movement", payload: closestPath });
-    this.handleStationaryBehavior();
-    return true;
+    return this.handleStationaryBehavior();
   }
 
   handlePassiveBehavior() {}
 
-  handleSupportBehavior() {}
+  handleSupportBehavior() {
+    const supportWeapons = this.unitManager.equippableWeapons.filter(
+      weapon => weapon.friendly
+    );
+    if (supportWeapons.length < 1) {
+      return false;
+    }
+
+    const targetableTiles = this.pathfinder.friendlyFireRange;
+    const targetableUnits = targetableTiles.reduce(
+      (acc, tile) => {
+        if (!tile.unit) {
+          return acc;
+        }
+        const { allegiance } = tile.unit.unitManager;
+        const canTarget =
+          (this.allegiance === "NEUTRAL" && allegiance !== "ENEMY") ||
+          (this.allegiance === "ENEMY" && allegiance === "ENEMY");
+        if (canTarget) {
+          acc.push(tile.unit);
+        }
+        return acc;
+      },
+      [] as MapManagedUnit[]
+    );
+    return true;
+  }
 
   handleThiefBehavior() {
     const { chests } = this.map;
     if (chests.filter(({ isOpened }) => !isOpened).length < 1) {
       this.handleActiveBehavior();
       return false;
+    }
+  }
+
+  handleSelfPreservationBehavior() {
+    if (this.unitManager.items) {
     }
   }
 
@@ -162,60 +196,6 @@ export default class UnitBehaviorService {
         currentCoordinates,
         this.pathfinder.currentCoordinates
       )
-    );
-  }
-
-  private getTargetableTilesFromCoordinates(coordinates: Coordinates) {
-    const { attackRange } = this.unit;
-    const [minRange, maxRange] = attackRange;
-    if (minRange === Infinity || maxRange === -Infinity) {
-      return [];
-    }
-    return this.map.getMapTileInfo(this.unit.unit).filter(tile => {
-      const distance = getManhattanDistance(tile.coordinates, coordinates);
-      return distance <= maxRange && distance >= minRange;
-    });
-  }
-
-  private get attackTiles() {
-    const { attackRange } = this.unit;
-    const [minRange, maxRange] = attackRange;
-
-    const list: MapTileInformation[] = [];
-    if (minRange === Infinity || maxRange === -Infinity) {
-      return list;
-    }
-
-    const applicableMapTiles = this.map
-      .getMapTileInfo(this.unit.unit)
-      .filter(tile => {
-        const canTraverseTile =
-          tile.terrain.calculated.movementCost <= this.unit.unit.stats.movement;
-
-        if (!canTraverseTile) {
-          return false;
-        }
-
-        return this.hostileUnits.some(hostileUnit => {
-          const distanceFromTile = getManhattanDistance(
-            tile.coordinates,
-            hostileUnit.pathfinder.currentCoordinates
-          );
-          const canAttackHostileUnitFromTile =
-            distanceFromTile <= maxRange && distanceFromTile >= minRange;
-
-          return canAttackHostileUnitFromTile;
-        });
-      });
-
-    list.push(...applicableMapTiles);
-
-    return list;
-  }
-
-  private get attackTilesByProximity() {
-    return sortBy(this.attackTiles, tile =>
-      this.getDistanceFromUnit(tile.coordinates)
     );
   }
 
