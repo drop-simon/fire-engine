@@ -1,13 +1,13 @@
 import merge from "lodash/merge";
 import UnitPathfindingService, {
-  UnitCoordinates,
   Coordinates,
   TerrainWithKey
 } from "./UnitPathfindingService";
-import { TerrainConfig, Unit } from "../types";
+import { TerrainConfig, Unit, UnitAllegiance } from "../types";
 import GameManagementService from "./GameManagementService";
-import { getMapSize } from "./utils";
+import { getMapDimensions } from "./utils";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
+import { UnitCoordinates } from "./BattleManagementService/UnitManagementService/UnitManagementService";
 
 export type MapConfigType = {
   terrain: TerrainConfig[][];
@@ -29,14 +29,14 @@ export type MapManagedUnit = {
 };
 
 export default class MapManagementService {
-  map: MapConfigType & ReturnType<typeof getMapSize>;
+  map: MapConfigType & ReturnType<typeof getMapDimensions>;
   gameManager: GameManagementService;
   units: MapManagedUnit[] = [];
   chests: { coordinates: Coordinates; isOpened?: false }[] = [];
 
   constructor({ map, units, gameManager }: MapManagementServiceConstructor) {
     this.addUnits(units);
-    this.map = { ...map, ...getMapSize(map) };
+    this.map = { ...map, ...getMapDimensions(map) };
     this.gameManager = gameManager;
   }
 
@@ -79,7 +79,7 @@ export default class MapManagementService {
     );
   }
 
-  getUnit(coordinates: Coordinates) {
+  getUnitAtCoordinates(coordinates: Coordinates) {
     return this.units.find(({ pathfinder }) =>
       pathfinder.compareCoordinates(pathfinder.currentCoordinates, coordinates)
     );
@@ -112,6 +112,18 @@ export default class MapManagementService {
       key: this.createTileKey({ x, y }),
       coordinates: { x, y }
     };
+  }
+
+  getMapTileInfo(unit?: Unit) {
+    return this.map.terrain.reduce(
+      (tiles, row, x) => {
+        row.forEach((_, y) =>
+          tiles.push(this.getTileInfo({ coordinates: { x, y }, unit }))
+        );
+        return tiles;
+      },
+      [] as MapTileInformation[]
+    );
   }
 
   createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;

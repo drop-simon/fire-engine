@@ -1,8 +1,22 @@
-import { WeaponType, Unit, UnitAllegiance } from "../../../types";
+import {
+  WeaponType,
+  Unit,
+  UnitAllegiance,
+  UnitBehavior,
+  WeaponSpecialty,
+  WeaponLevelType
+} from "../../../types";
 import { increaseStats } from "../../utils";
 import GameManagementService from "../../GameManagementService";
 import MapManagementService from "../../MapManagementService";
-import { UnitCoordinates } from "../../UnitPathfindingService";
+import { Coordinates } from "../../UnitPathfindingService";
+
+export type UnitCoordinates = {
+  unit: Unit;
+  coordinates: Coordinates;
+  allegiance: UnitAllegiance;
+  behavior?: UnitBehavior;
+};
 
 interface UnitManagementServiceConfig {
   unitCoordinates: UnitCoordinates;
@@ -12,12 +26,13 @@ interface UnitManagementServiceConfig {
 
 export default class UnitManagementService {
   unit: Unit;
+  behavior: UnitBehavior;
   allegiance: UnitAllegiance;
   gameManager: GameManagementService;
   mapManager: MapManagementService;
 
   constructor({
-    unitCoordinates: { unit, allegiance },
+    unitCoordinates: { unit, allegiance, behavior },
     gameManager,
     mapManager
   }: UnitManagementServiceConfig) {
@@ -48,18 +63,40 @@ export default class UnitManagementService {
     return this;
   }
 
+  canEquipWeapon = (weapon: WeaponType) =>
+    this.unit.weaponLevels.some(
+      ({ specialty, level }) =>
+        specialty == weapon.specialty && level <= weapon.level
+    );
+
   get weapons() {
     return this.unit.items.filter(
       ({ category }) => category === "Weapon"
     ) as WeaponType[];
   }
 
+  get equippableWeapons() {
+    return this.weapons.filter(this.canEquipWeapon);
+  }
+
   get equippedWeapon() {
-    return this.weapons.find(weapon =>
-      this.unit.weaponLevels.some(
-        ({ specialty, level }) =>
-          specialty == weapon.specialty && level <= weapon.level
-      )
+    return this.weapons.find(this.canEquipWeapon);
+  }
+
+  get attackRange() {
+    return this.equippableWeapons.reduce(
+      (acc, weapon) => {
+        if (weapon.range[0] < acc[0]) {
+          acc[0] = weapon.range[0];
+        }
+
+        if (weapon.range[1] > acc[1]) {
+          acc[1] = weapon.range[1];
+        }
+
+        return acc;
+      },
+      [Infinity, -Infinity] as WeaponType["range"]
     );
   }
 

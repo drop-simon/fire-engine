@@ -182,8 +182,6 @@ export type AnyUnit = UnitConfig<CombatCategory>;
 
 export type Unit = ReturnType<UnitCreationService<CombatCategory>["process"]>;
 
-export type ManagedUnit = UnitManagementService;
-
 export type UnitDependantFunction<T extends any> = (unit: Unit) => T;
 
 export type UnitAllegiance = "PLAYER" | "ENEMY" | "NEUTRAL";

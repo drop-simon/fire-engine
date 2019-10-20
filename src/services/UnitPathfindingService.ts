@@ -2,24 +2,17 @@ import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { Unit, TerrainConfig, UnitAllegiance } from "../types";
+import { TerrainConfig, UnitAllegiance } from "../types";
 import MapManagementService, {
-  MapConfigType,
   MapTileInformation
 } from "./MapManagementService";
-import { getMapSize } from "./utils";
+import { getMapDimensions } from "./utils";
 import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 
 export type Coordinates = {
   x: number;
   y: number;
-};
-
-export type UnitCoordinates = {
-  unit: Unit;
-  coordinates: Coordinates;
-  allegiance: UnitAllegiance;
 };
 
 export interface TerrainWithKey extends TerrainConfig {
@@ -208,7 +201,7 @@ export default class UnitPathfindingService {
   }
 
   private isWithinBounds = ({ x, y }: Coordinates) => {
-    const { width, height } = getMapSize(this.mapManager.map);
+    const { width, height } = getMapDimensions(this.mapManager.map);
     const outOfBoundsX = x < 0 || x > width;
     const outOfBoundsY = y < 0 || y > height;
     return !(outOfBoundsX || outOfBoundsY);

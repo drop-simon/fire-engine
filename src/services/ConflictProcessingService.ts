@@ -1,6 +1,4 @@
-import { ManagedUnit } from "../types";
 import { getProbabilityResult, getManhattanDistance } from "./utils";
-import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import { MapManagedUnit } from "./MapManagementService";
 
 interface ConflictProcessingServiceConstructor {
