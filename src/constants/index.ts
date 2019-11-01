@@ -1,5 +1,11 @@
-export * from "./terrain";
-export * from "./affinities";
-export * from "./classes";
-export * from "./items";
-export { default as Units } from "./units";
+import * as AllTerrain from "./terrain";
+import * as AllAffinities from "./affinities";
+import * as AllClasses from "./classes";
+import * as AllItems from "./items";
+import * as AllUnits from "./units";
+
+export const Terrain = AllTerrain;
+export const Affinities = AllAffinities;
+export const Classes = AllClasses;
+export const Items = AllItems;
+export const Units = AllUnits;

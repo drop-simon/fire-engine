@@ -15,11 +15,10 @@ const createVoidLikeTile = (name: string): TerrainConfig => ({
   },
   getUnitModifications: () => ({})
 });
-const VOID_LIKE_TERRAIN = {
-  Void: createVoidLikeTile("void"),
-  Wall: createVoidLikeTile("wall"),
-  BuildingSpace: createVoidLikeTile("building space")
-} as const;
+
+export const Void = createVoidLikeTile("void");
+export const Wall = createVoidLikeTile("wall");
+export const BuildingSpace = createVoidLikeTile("building space");
 
 const createGapLikeTile = (name: string): TerrainConfig => ({
   name,
@@ -36,13 +35,11 @@ const createGapLikeTile = (name: string): TerrainConfig => ({
   getUnitModifications: ({ base: { flying } }: Unit) =>
     flying ? { movementCost: 1 } : {}
 });
-const GAP_LIKE_TERRAIN = {
-  Gap: createGapLikeTile("gap"),
-  Thicket: createGapLikeTile("thicket"),
-  Cliff: createGapLikeTile("cliff"),
-  Fence: createGapLikeTile("fence"),
-  Snag: createGapLikeTile("snag")
-};
+export const Gap = createGapLikeTile("gap");
+export const Thicket = createGapLikeTile("thicket");
+export const Cliff = createGapLikeTile("cliff");
+export const Fence = createGapLikeTile("fence");
+export const Snag = createGapLikeTile("snag");
 
 const createFloorLikeTile = (name: string): TerrainConfig => ({
   name,
@@ -58,12 +55,10 @@ const createFloorLikeTile = (name: string): TerrainConfig => ({
   },
   getUnitModifications: () => ({})
 });
-const FLOOR_LIKE_TERRAIN = {
-  Floor: createFloorLikeTile("floor"),
-  Plain: createFloorLikeTile("plains"),
-  Chest: createFloorLikeTile("chest"),
-  Bridge: createFloorLikeTile("bridge")
-} as const;
+export const Floor = createFloorLikeTile("floor");
+export const Plain = createFloorLikeTile("plains");
+export const Chest = createFloorLikeTile("chest");
+export const Bridge = createFloorLikeTile("bridge");
 
 const createVillageLikeTile = (name: string): TerrainConfig => ({
   name,
@@ -79,15 +74,13 @@ const createVillageLikeTile = (name: string): TerrainConfig => ({
   },
   getUnitModifications: () => ({})
 });
-const VILLAGE_LIKE_TERRAIN = {
-  Village: createVillageLikeTile("village"),
-  Armory: createVillageLikeTile("armory"),
-  Vendor: createVillageLikeTile("vendor"),
-  Arena: createVillageLikeTile("arena"),
-  Stairs: createVillageLikeTile("stairs")
-} as const;
+export const Village = createVillageLikeTile("village");
+export const Armory = createVillageLikeTile("armory");
+export const Vendor = createVillageLikeTile("vendor");
+export const Arena = createVillageLikeTile("arena");
+export const Stairs = createVillageLikeTile("stairs");
 
-const Ballista: TerrainConfig = {
+export const Ballista: TerrainConfig = {
   name: "ballista",
   movementCost: 2,
   effects: {
@@ -103,7 +96,7 @@ const Ballista: TerrainConfig = {
     flying ? { movementCost: 1 } : {}
 };
 
-const Forest: TerrainConfig = {
+export const Forest: TerrainConfig = {
   name: "forest",
   movementCost: 2,
   effects: {
@@ -119,7 +112,7 @@ const Forest: TerrainConfig = {
     flying ? { movementCost: 1 } : horseback ? { movementCost: 3 } : {}
 };
 
-const Pillar: TerrainConfig = {
+export const Pillar: TerrainConfig = {
   name: "pillar",
   movementCost: 2,
   effects: {
@@ -139,13 +132,13 @@ const Pillar: TerrainConfig = {
       : {}
 };
 
-const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
+export const MOUNTAIN_TRAVERSABLE_UNITS: string[] = [
   "Fighter",
   "Warrior",
   "Berserker",
   "Pirate"
 ];
-const Mountain: TerrainConfig = {
+export const Mountain: TerrainConfig = {
   name: "mountain",
   movementCost: Infinity,
   effects: {
@@ -165,7 +158,7 @@ const Mountain: TerrainConfig = {
       : {}
 };
 
-const Peak: TerrainConfig = {
+export const Peak: TerrainConfig = {
   name: "peak",
   movementCost: Infinity,
   effects: {
@@ -185,7 +178,7 @@ const Peak: TerrainConfig = {
       : {}
 };
 
-const Gate: TerrainConfig = {
+export const Gate: TerrainConfig = {
   name: "gate",
   movementCost: 1,
   effects: {
@@ -202,7 +195,7 @@ const Gate: TerrainConfig = {
   })
 };
 
-const Throne: TerrainConfig = {
+export const Throne: TerrainConfig = {
   name: "throne",
   movementCost: 1,
   effects: {
@@ -217,8 +210,8 @@ const Throne: TerrainConfig = {
   getUnitModifications: Gate.getUnitModifications
 };
 
-const WATER_TRAVERSABLE_UNITS: string[] = ["Berserker", "Pirate"];
-const Sea: TerrainConfig = {
+export const WATER_TRAVERSABLE_UNITS: string[] = ["Berserker", "Pirate"];
+export const Sea: TerrainConfig = {
   name: "sea",
   movementCost: Infinity,
   effects: {
@@ -238,7 +231,7 @@ const Sea: TerrainConfig = {
       : {}
 };
 
-const Lake: TerrainConfig = {
+export const Lake: TerrainConfig = {
   name: "lake",
   movementCost: Infinity,
   effects: {
@@ -258,7 +251,7 @@ const Lake: TerrainConfig = {
       : {}
 };
 
-const Fort: TerrainConfig = {
+export const Fort: TerrainConfig = {
   name: "fort",
   movementCost: 2,
   effects: {
@@ -274,7 +267,7 @@ const Fort: TerrainConfig = {
     flying ? { movementCost: 1 } : {}
 };
 
-const Desert: TerrainConfig = {
+export const Desert: TerrainConfig = {
   name: "desert",
   movementCost: 2,
   effects: {
@@ -294,7 +287,7 @@ const Desert: TerrainConfig = {
       : {}
 };
 
-const River: TerrainConfig = {
+export const River: TerrainConfig = {
   name: "river",
   movementCost: Infinity,
   effects: {
@@ -314,23 +307,7 @@ const River: TerrainConfig = {
       : {}
 };
 
-const Cliff: TerrainConfig = {
-  name: "cliff",
-  movementCost: Infinity,
-  effects: {
-    static: {
-      defense: 0,
-      avoid: 0
-    },
-    ongoing: {
-      health: 0
-    }
-  },
-  getUnitModifications: ({ base: { flying } }: Unit) =>
-    flying ? { movementCost: 1 } : {}
-};
-
-const Ruins: TerrainConfig = {
+export const Ruins: TerrainConfig = {
   name: "ruins",
   movementCost: 2,
   effects: {
@@ -346,7 +323,7 @@ const Ruins: TerrainConfig = {
     flying ? { movementCost: 1 } : {}
 };
 
-const Sand: TerrainConfig = {
+export const Sand: TerrainConfig = {
   name: "sand",
   movementCost: 1,
   effects: {
@@ -360,25 +337,3 @@ const Sand: TerrainConfig = {
   },
   getUnitModifications: () => ({})
 };
-
-export const Terrain = {
-  ...VOID_LIKE_TERRAIN,
-  ...GAP_LIKE_TERRAIN,
-  ...FLOOR_LIKE_TERRAIN,
-  ...VILLAGE_LIKE_TERRAIN,
-  Ballista,
-  Lake,
-  River,
-  Fort,
-  Ruins,
-  Forest,
-  Pillar,
-  Mountain,
-  Peak,
-  Gate,
-  Throne,
-  Sea,
-  Desert,
-  Cliff,
-  Sand
-} as const;

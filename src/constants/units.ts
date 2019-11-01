@@ -1,5 +1,5 @@
 import { Lord } from "./classes/physical";
-import { Items } from ".";
+import * as Items from "./items";
 import UnitCreationService from "../services/UnitCreationService";
 
 export const Calypso = new UnitCreationService<"Physical">({

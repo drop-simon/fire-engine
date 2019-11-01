@@ -1,9 +1,7 @@
-import * as Weapons from "./weapons";
-import * as Consumables from "./consumables";
-import * as Promotional from "./promotional";
+import * as AllWeapons from "./weapons";
+import * as AllConsumables from "./consumables";
+import * as AllPromotional from "./promotional";
 
-export const Items = {
-  Weapons,
-  Consumables,
-  Promotional
-};
+export const Weapons = AllWeapons;
+export const Consumables = AllConsumables;
+export const Promotional = AllPromotional;

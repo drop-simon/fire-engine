@@ -1,15 +1,17 @@
+import u from "updeep";
+import isEqual from "lodash/isEqual";
 import {
   WeaponType,
   Unit,
   UnitAllegiance,
   UnitBehavior,
-  WeaponSpecialty,
-  WeaponLevelType
+  Item
 } from "../../../types";
 import { increaseStats } from "../../utils";
 import GameManagementService from "../../GameManagementService";
 import MapManagementService from "../../MapManagementService";
 import { Coordinates } from "../../UnitPathfindingService";
+import { DeepPartial } from "../../../types/util";
 
 export type UnitCoordinates = {
   unit: Unit;
@@ -63,18 +65,22 @@ export default class UnitManagementService {
     return this;
   }
 
-  getCanEquipWeapon = (weapon: WeaponType) =>
-    this.unit.weaponLevels.some(
-      ({ specialty, level }) =>
-        specialty == weapon.specialty && level <= weapon.level
-    );
+  get calculatedStats() {
+    return this.unit.stats;
+  }
 
   get items() {
     return this.unit.items;
   }
 
-  get weapons() {
+  get healingItems() {
     return this.items.filter(
+      ({ effect }) => effect && effect.static && effect.static.health
+    );
+  }
+
+  get weapons() {
+    return this.unit.items.filter(
       ({ category }) => category === "Weapon"
     ) as WeaponType[];
   }
@@ -94,6 +100,26 @@ export default class UnitManagementService {
     return this.equippedWeapon.specialty;
   }
 
+  get equippableAttackWeapons() {
+    return this.equippableWeapons.filter(({ friendly }) => !friendly);
+  }
+
+  get equippableSupportWeapons() {
+    return this.equippableWeapons.filter(({ friendly }) => friendly);
+  }
+
+  get supportRanges() {
+    return this.equippableSupportWeapons.map(w => w.range);
+  }
+
+  get attackRanges() {
+    return this.equippableSupportWeapons.map(w => w.range);
+  }
+
+  get damageTaken() {
+    return this.unit.stats.health - this.calculatedStats.health;
+  }
+
   get conflictStats() {
     return {
       attackPower: this.attackPower,
@@ -105,6 +131,12 @@ export default class UnitManagementService {
       staffAccuracy: this.staffAccuracy
     };
   }
+
+  getCanEquipWeapon = (weapon: WeaponType) =>
+    this.unit.weaponLevels.some(
+      ({ specialty, level }) =>
+        specialty == weapon.specialty && level <= weapon.level
+    );
 
   private get attackPower() {
     if (this.equippedWeapon) {

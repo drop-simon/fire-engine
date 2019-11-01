@@ -1,10 +1,10 @@
-import { Affinities, Months } from "../constants";
+import { Affinities } from "../constants";
 
-export type BirthMonthType = keyof typeof Months;
+export type BirthMonthType = keyof typeof Affinities["Months"];
 
 export type BloodType = "A" | "B" | "O" | "AB";
 
-export type AffinityName = keyof typeof Affinities;
+export type AffinityName = Exclude<keyof typeof Affinities, "Months">;
 
 export type AffinityBonusType = {
   power?: number;

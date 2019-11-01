@@ -1,4 +1,8 @@
 import { ConsumableItemConfig, StatListType, Unit } from "../../types";
+import {
+  MapManagedUnit,
+  MapTileInformation
+} from "../../services/MapManagementService";
 
 const getCanIncreaseUnitStat = (unit: Unit, stat: keyof StatListType) =>
   unit.base.maxStats[stat] > unit.stats[stat];
@@ -53,7 +57,8 @@ export const Speedwing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { speed: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "speed"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "speed"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "speed"),
   cost: 8000
 };
@@ -64,7 +69,8 @@ export const SkillTome: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { skill: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "skill"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "skill"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "skill"),
   cost: 8000
 };
@@ -75,7 +81,8 @@ export const EnergyRing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { power: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "power"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "power"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "power"),
   cost: 8000
 };
@@ -86,7 +93,8 @@ export const DragonShield: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { defense: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "defense"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "defense"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "defense"),
   cost: 8000
 };
@@ -97,7 +105,8 @@ export const Talisman: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { resistance: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "resistance"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "resistance"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "resistance"),
   cost: 8000
 };
@@ -108,7 +117,8 @@ export const AngelicRobe: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { health: 7 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "health"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "health"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "health"),
   cost: 8000
 };
@@ -119,7 +129,8 @@ export const GoddessIcon: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { luck: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "luck"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "luck"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "luck"),
   cost: 8000
 };
@@ -130,7 +141,8 @@ export const BodyRing: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { constitution: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "constitution"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "constitution"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "constitution"),
   cost: 8000
 };
@@ -141,7 +153,8 @@ export const Swiftsoles: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getCanUseInMap: ({ unit }) => getCanIncreaseUnitStat(unit, "movement"),
+  getCanUseInMap: ({ unitManager: { unit } }) =>
+    getCanIncreaseUnitStat(unit, "movement"),
   getCanUseInOverworld: unit => getCanIncreaseUnitStat(unit, "movement"),
   cost: 8000
 };
@@ -152,18 +165,15 @@ export const ChestKey: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getCanUseInMap: ({ unit, battleManager }) => {
-    const pathfinder = battleManager.mapManager.pathfinders[unit.name];
-    if (unit.items.length > 4 || !pathfinder) {
+  getCanUseInMap: ({ unitManager, pathfinder }) => {
+    if (unitManager.items.length > 4) {
       return false;
     }
 
-    const { currentCoordinates, createTileKey } = pathfinder;
-
-    return battleManager.mapManager.chests.some(
+    const { currentCoordinates, compareCoordinates, mapManager } = pathfinder;
+    return mapManager.chests.some(
       ({ coordinates, isOpened }) =>
-        !isOpened &&
-        createTileKey(coordinates) === createTileKey(currentCoordinates)
+        !isOpened && compareCoordinates(coordinates, currentCoordinates)
     );
   },
   getCanUseInOverworld: () => false,
@@ -176,14 +186,13 @@ export const DoorKey: ConsumableItemConfig = {
   maxUses: 1,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getCanUseInMap: ({ unit, battleManager }) => {
-    const pathfinder = battleManager.mapManager.pathfinders[unit.name];
+  getCanUseInMap: ({ pathfinder }) => {
     if (!pathfinder) {
       return false;
     }
     const { currentCoordinates, getAdjacentTiles } = pathfinder;
     return getAdjacentTiles(currentCoordinates).some(
-      tile => tile.name === "door"
+      tile => tile.terrain.base.name === "door"
     );
   },
   getCanUseInOverworld: () => false,
@@ -196,13 +205,13 @@ export const Lockpick: ConsumableItemConfig = {
   maxUses: 15,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getCanUseInMap: ({ unit, battleManager }) => {
-    if (unit.base.name !== "Thief") {
+  getCanUseInMap: ({ unitManager, pathfinder }) => {
+    if (unitManager.unit.base.name !== "Thief") {
       return false;
     }
     return (
-      DoorKey.getCanUseInMap({ unit, battleManager }) ||
-      ChestKey.getCanUseInMap({ unit, battleManager })
+      DoorKey.getCanUseInMap({ unitManager, pathfinder }) ||
+      ChestKey.getCanUseInMap({ unitManager, pathfinder })
     );
   },
   getCanUseInOverworld: () => false,

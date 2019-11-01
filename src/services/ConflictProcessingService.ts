@@ -94,8 +94,8 @@ export default class ConflictProcessingService {
 
     const isMagicAttack = aggressor.unitManager.unit.base.category === "Magic";
     const defenseStat = isMagicAttack
-      ? defender.unitManager.unit.stats.resistance
-      : defender.unitManager.unit.stats.defense;
+      ? defender.unitManager.calculatedStats.resistance
+      : defender.unitManager.calculatedStats.defense;
     const damage =
       aggressor.unitManager.conflictStats.attackPower - defenseStat;
 
@@ -130,7 +130,8 @@ export default class ConflictProcessingService {
       aggressor.pathfinder.currentCoordinates,
       defender.pathfinder.currentCoordinates
     );
-    const resistanceModifier = defender.unitManager.unit.stats.resistance * 5;
+    const resistanceModifier =
+      defender.unitManager.calculatedStats.resistance * 5;
     const distanceModifier = manhattanDistance * 2;
 
     return resistanceModifier + distanceModifier;

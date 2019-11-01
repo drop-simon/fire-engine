@@ -1,19 +1,15 @@
 import Graph from "node-dijkstra";
 import compact from "lodash/compact";
-import range from "lodash/range";
 import uniqBy from "lodash/uniqBy";
-import { TerrainConfig, UnitAllegiance, WeaponType, Unit } from "../types";
+import { TerrainConfig, UnitAllegiance, WeaponType } from "../types";
 import MapManagementService, {
   MapTileInformation
 } from "./MapManagementService";
-import {
-  getMapDimensions,
-  getManhattanDistance,
-  getTargetableTiles
-} from "./utils";
+import { getManhattanDistance, getTargetableTiles } from "./utils";
 import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import merge from "lodash/merge";
+import { areUnitsAllied } from "./BattleManagementService/UnitManagementService/utils";
 
 export type Coordinates = {
   x: number;
@@ -46,6 +42,7 @@ type GetPathTo = (args: {
   start: Coordinates;
   end: Coordinates;
   uninterrupted?: boolean;
+  graph?: Graph;
 }) => MapTileInformation[];
 
 export default class UnitPathfindingService {
@@ -55,7 +52,7 @@ export default class UnitPathfindingService {
   allegiance: UnitAllegiance;
   currentCoordinates: Coordinates;
   processedTiles: MapTileInformation[] = [];
-  tileMap = new Map<string, MapTileInformation>();
+  tileMap: { [key: string]: MapTileInformation } = {};
   graph = new Graph();
 
   constructor({
@@ -77,41 +74,93 @@ export default class UnitPathfindingService {
     mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
-        const tile = this.getTileInfo({ coordinates: { x, y } });
+        const tile = this.getTileInfo({ x, y });
         if (!node || !tile) {
           return;
         }
-        this.tileMap.set(node.key, tile);
+        this.tileMap[node.key] = tile;
         this.graph.addNode(node.key, node.value);
         this.processedTiles.push(tile);
       });
     });
   }
 
-  private get nonTraversableTiles() {
-    return this.processedTiles
-      .filter(tile => tile.terrain.calculated.movementCost === Infinity)
-      .map(tile => tile.key);
+  get walkableTiles() {
+    const {
+      currentCoordinates,
+      unitManager: {
+        calculatedStats: { movement }
+      }
+    } = this;
+
+    const didCheck: { [key: string]: true } = {};
+    return this.processedTiles.reduce(
+      (acc, tile) => {
+        if (didCheck[tile.key]) {
+          return acc;
+        }
+
+        const distance = getManhattanDistance(
+          tile.coordinates,
+          currentCoordinates
+        );
+        if (distance > movement) {
+          return acc;
+        }
+
+        const path = this.getPathTo({
+          start: currentCoordinates,
+          end: tile.coordinates,
+          graph: this.movementRangeGraph
+        });
+        if (!path) {
+          return acc;
+        }
+
+        path.forEach(tile => {
+          if (!didCheck[tile.key]) {
+            didCheck[tile.key] = true;
+            acc.push(tile);
+          }
+        });
+
+        return acc;
+      },
+      [] as MapTileInformation[]
+    );
   }
 
-  getPathTo: GetPathTo = ({ start, end, uninterrupted = false }) => {
+  get friendlyFireTiles() {
+    return this.getTargetableTiles({ friendly: true });
+  }
+
+  get attackableTiles() {
+    return this.getTargetableTiles({ friendly: false });
+  }
+
+  getPathTo: GetPathTo = ({
+    start,
+    end,
+    uninterrupted = false,
+    graph = this.graph
+  }) => {
     const startKey = this.createTileKey(start);
     const endKey = this.createTileKey(end);
-    const path: string[] | null = this.graph.path(startKey, endKey, {
+    const path: string[] | null = graph.path(startKey, endKey, {
       avoid: this.nonTraversableTiles
     });
 
     if (!path) {
-      return [];
+      return null;
     }
 
     let stepsLeft = uninterrupted
       ? Infinity
-      : this.unitManager.unit.stats.movement;
+      : this.unitManager.calculatedStats.movement;
 
     const mappedPath = path.slice(1).reduce(
       (mappedPath, key) => {
-        const node = this.tileMap.get(key);
+        const node = this.tileMap[key];
         if (node.terrain.calculated.movementCost > stepsLeft) {
           stepsLeft = 0;
           return mappedPath;
@@ -149,131 +198,14 @@ export default class UnitPathfindingService {
     });
   };
 
-  get walkableTiles() {
-    const fullMovementRange = this.getFullMovementRange();
-    const walkableTiles = fullMovementRange.reduce(
-      (acc, coordinates) => {
-        const endKey = this.createTileKey(coordinates);
-        if (
-          acc.some(tile => tile.key === endKey) ||
-          this.nonTraversableTiles.includes(endKey)
-        ) {
-          return acc;
-        }
-        const path = this.getPathTo({
-          start: this.currentCoordinates,
-          end: coordinates
-        });
-        acc.push(...path);
-        return acc;
-      },
-      [] as MapTileInformation[]
-    );
-    return uniqBy(walkableTiles, "key");
-  }
-
   getAdjacentTiles = (coordinates: Coordinates) =>
     compact(
       ADJACENT_TILE_INDICES.map(({ x, y }) =>
-        this.getTileInfo({
-          coordinates: { x: coordinates.x + x, y: coordinates.y + y }
-        })
+        this.getTileInfo({ x: coordinates.x + x, y: coordinates.y + y })
       )
     );
 
-  compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
-    return this.createTileKey(coordsA) === this.createTileKey(coordsB);
-  }
-
-  get conflictRange() {
-    return this.getFullRangeFromWeapons(
-      this.unitManager.equippableWeapons.filter(weapon => !weapon.friendly)
-    );
-  }
-
-  get friendlyFireRange() {
-    return this.getFullRangeFromWeapons(
-      this.unitManager.equippableWeapons.filter(weapon => weapon.friendly)
-    );
-  }
-
-  getFullRangeFromWeapons(weapons: WeaponType[]) {
-    const tiles = weapons.reduce(
-      (acc, weapon) => acc.concat(this.getFullRangeFromWeapon(weapon)),
-      [] as MapTileInformation[]
-    );
-    return uniqBy(tiles, "key");
-  }
-
-  getFullRangeFromWeapon(weapon: WeaponType) {
-    const [min, max] = weapon.range;
-    const allTiles = this.getMapInfo(this.unitManager.unit);
-    const targetableTiles = this.walkableTiles.reduce(
-      (acc, currentTile) => {
-        const tiles = getTargetableTiles({
-          origin: currentTile,
-          tiles: allTiles,
-          weaponRange: [min, max]
-        });
-        return acc.concat(tiles);
-      },
-      [] as MapTileInformation[]
-    );
-    return uniqBy(targetableTiles, "key");
-  }
-
-  getRangeFromWeapon(weapon: WeaponType, tile: MapTileInformation) {
-    const [min, max] = weapon.range;
-    const allTiles = this.getMapInfo(this.unitManager.unit);
-    return getTargetableTiles({
-      origin: tile,
-      tiles: allTiles,
-      weaponRange: [min, max]
-    });
-  }
-
-  getMapInfo(unit?: Unit) {
-    return this.mapManager.map.terrain.reduce(
-      (tiles, row, x) => {
-        row.forEach((_, y) =>
-          tiles.push(this.getTileInfo({ coordinates: { x, y } }))
-        );
-        return tiles;
-      },
-      [] as MapTileInformation[]
-    );
-  }
-
-  private getFullMovementRange() {
-    const { movement } = this.unitManager.unit.stats;
-    const { currentCoordinates } = this;
-
-    const coordinates = range(-movement, movement + 1).reduce(
-      (coordinatesList, step) => {
-        const x = currentCoordinates.x + step;
-        const verticalRange = movement - Math.abs(step);
-
-        let newCoordinates: Coordinates[] = [];
-        for (let i = 0; i <= verticalRange; i++) {
-          newCoordinates.push({ x, y: currentCoordinates.y + i });
-          newCoordinates.push({ x, y: currentCoordinates.y - i });
-        }
-        coordinatesList.push(...newCoordinates.filter(this.isWithinBounds));
-        return coordinatesList;
-      },
-      [currentCoordinates] as Coordinates[]
-    );
-    return uniqBy(coordinates, this.createTileKey);
-  }
-
-  private isWithinBounds = ({ x, y }: Coordinates) => {
-    const { width, height } = getMapDimensions(this.mapManager.map);
-    const outOfBoundsX = x < 0 || x > width;
-    const outOfBoundsY = y < 0 || y > height;
-    return !(outOfBoundsX || outOfBoundsY);
-  };
-
-  private getTileInfo({ coordinates: { x, y } }: { coordinates: Coordinates }) {
+  getTileInfo({ x, y }: Coordinates) {
     const row = this.mapManager.map.terrain[y];
     if (!row) {
       return null;
@@ -289,21 +221,86 @@ export default class UnitPathfindingService {
     return {
       terrain: {
         base: baseTerrain,
-        calculated: mapManagedUnit
-          ? merge(
-              baseTerrain,
-              getUnitModifications(mapManagedUnit.unitManager.unit)
-            )
-          : null
+        calculated: merge(
+          baseTerrain,
+          getUnitModifications(this.unitManager.unit)
+        )
       },
       unit: mapManagedUnit,
+      chest: this.mapManager.chests.find(({ coordinates }) =>
+        this.compareCoordinates(coordinates, { x, y })
+      ),
       key: this.createTileKey({ x, y }),
       coordinates: { x, y }
     };
   }
 
+  compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
+    return this.createTileKey(coordsA) === this.createTileKey(coordsB);
+  }
+
+  private getTargetableTiles({ friendly }: { friendly: boolean }) {
+    const conflictRanges = this.unitManager[
+      friendly ? "supportRanges" : "attackRanges"
+    ];
+    if (conflictRanges.length < 1) {
+      return [];
+    }
+
+    const { walkableTiles } = this;
+    const targetableTiles = this.processedTiles.filter(processedTile =>
+      walkableTiles.some(walkableTile => {
+        const distance = getManhattanDistance(
+          processedTile.coordinates,
+          walkableTile.coordinates
+        );
+
+        return conflictRanges.some(
+          ([min, max]) => distance >= min && distance <= max
+        );
+      })
+    );
+
+    return targetableTiles;
+  }
+
+  private get nonTraversableTiles() {
+    return this.processedTiles
+      .filter(tile => {
+        if (tile.terrain.calculated.movementCost === Infinity) {
+          return false;
+        }
+
+        if (
+          tile.unit &&
+          !areUnitsAllied(this.unitManager, tile.unit.unitManager)
+        ) {
+          return true;
+        }
+      })
+      .map(tile => tile.key);
+  }
+
+  private get movementRangeGraph() {
+    return this.processedTiles.reduce((graph, tile) => {
+      const distance = getManhattanDistance(
+        this.currentCoordinates,
+        tile.coordinates
+      );
+      if (distance <= this.unitManager.calculatedStats.movement) {
+        const node = this.createDijkstraNode(tile.coordinates);
+        if (node) {
+          graph.addNode(node.key, node.value);
+        }
+      }
+      return graph;
+    }, new Graph());
+  }
+
+  private createTileKey = ({ x, y }: Coordinates) => `{"x":${x},"y":${y}}`;
+
   private createDijkstraNode = (coordinates: Coordinates) => {
-    const tile = this.getTileInfo({ coordinates });
+    const tile = this.getTileInfo(coordinates);
     if (!tile) {
       return null;
     }
@@ -319,6 +316,4 @@ export default class UnitPathfindingService {
     };
     return { value: dijkstraNode, key: tile.key };
   };
-
-  private createTileKey = ({ x, y }: Coordinates) => `x:${x},y:${y}`;
 }

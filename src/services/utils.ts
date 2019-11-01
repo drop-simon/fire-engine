@@ -1,5 +1,5 @@
-import { StatListType, StatGrowthRateListType } from "../types";
-import { MapConfigType, MapTileInformation } from "./MapManagementService";
+import { StatListType, StatGrowthRateListType, TerrainConfig } from "../types";
+import { MapTerrain, MapTileInformation } from "./MapManagementService";
 import { Coordinates } from "./UnitPathfindingService";
 
 // probability is a float between 0 and 1
@@ -24,9 +24,9 @@ export const increaseStats = ({
   return nextStats;
 };
 
-export const getMapDimensions = function(map: MapConfigType) {
-  const width = map.terrain[0].length - 1;
-  const height = map.terrain.length - 1;
+export const getMapDimensions = function(terrain: MapTerrain) {
+  const width = terrain[0].length - 1;
+  const height = terrain.length - 1;
 
   return { width, height };
 };

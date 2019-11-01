@@ -5,16 +5,14 @@ import { getMapDimensions } from "./utils";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import { UnitCoordinates } from "./BattleManagementService/UnitManagementService/UnitManagementService";
 
-export type MapConfigType = {
-  terrain: TerrainConfig[][];
-};
-
 export type MapTileInformation = ReturnType<
   UnitPathfindingService["getTileInfo"]
 >;
 
+export type MapTerrain = TerrainConfig[][];
+
 export interface MapManagementServiceConstructor {
-  map: MapConfigType;
+  terrain: MapTerrain;
   units: UnitCoordinates[];
   gameManager: GameManagementService;
 }
@@ -25,14 +23,18 @@ export type MapManagedUnit = {
 };
 
 export default class MapManagementService {
-  map: MapConfigType & ReturnType<typeof getMapDimensions>;
+  map: { terrain: MapTerrain } & ReturnType<typeof getMapDimensions>;
   gameManager: GameManagementService;
   units: MapManagedUnit[] = [];
   chests: { coordinates: Coordinates; isOpened?: false }[] = [];
 
-  constructor({ map, units, gameManager }: MapManagementServiceConstructor) {
+  constructor({
+    terrain,
+    units,
+    gameManager
+  }: MapManagementServiceConstructor) {
     this.addUnits(units);
-    this.map = { ...map, ...getMapDimensions(map) };
+    this.map = { terrain, ...getMapDimensions(terrain) };
     this.gameManager = gameManager;
   }
 

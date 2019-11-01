@@ -1,9 +1,7 @@
-import * as Magic from "./magic";
-import * as Physical from "./physical";
-import * as Special from "./special";
+import * as MagicClasses from "./magic";
+import * as PhysicalClasses from "./physical";
+import * as SpecialClasses from "./special";
 
-export const Classes = {
-  Magic,
-  Physical,
-  Special
-} as const;
+export const Magic = MagicClasses;
+export const Physical = PhysicalClasses;
+export const Special = SpecialClasses;

@@ -8,8 +8,6 @@ type GameEventHandlers = {
     currentStats: StatGrowthRateListType;
     nextStats: StatGrowthRateListType;
   }) => any;
-  // dialogue: (queue: DialogueQueue) => any;
-  // conflict: (queue: ConflictQueue) => any;
   chapter: (queue: Chapter) => any;
 };
 

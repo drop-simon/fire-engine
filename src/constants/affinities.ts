@@ -1,6 +1,6 @@
 import { AffinityType } from "../types";
 
-const Anima: AffinityType = {
+export const Anima: AffinityType = {
   name: "Anima",
   supportBonus: {
     power: 0.5,
@@ -10,7 +10,7 @@ const Anima: AffinityType = {
   }
 };
 
-const Dark: AffinityType = {
+export const Dark: AffinityType = {
   name: "Dark",
   supportBonus: {
     avoid: 2.5,
@@ -20,7 +20,7 @@ const Dark: AffinityType = {
   }
 };
 
-const Fire: AffinityType = {
+export const Fire: AffinityType = {
   name: "Fire",
   supportBonus: {
     power: 0.5,
@@ -30,7 +30,7 @@ const Fire: AffinityType = {
   }
 };
 
-const Ice: AffinityType = {
+export const Ice: AffinityType = {
   name: "Ice",
   supportBonus: {
     defense: 0.5,
@@ -40,7 +40,7 @@ const Ice: AffinityType = {
   }
 };
 
-const Light: AffinityType = {
+export const Light: AffinityType = {
   name: "Light",
   supportBonus: {
     power: 0.5,
@@ -50,7 +50,7 @@ const Light: AffinityType = {
   }
 };
 
-const Thunder: AffinityType = {
+export const Thunder: AffinityType = {
   name: "Thunder",
   supportBonus: {
     defense: 0.5,
@@ -60,7 +60,7 @@ const Thunder: AffinityType = {
   }
 };
 
-const Wind: AffinityType = {
+export const Wind: AffinityType = {
   name: "Wind",
   supportBonus: {
     power: 0.5,
@@ -70,111 +70,101 @@ const Wind: AffinityType = {
   }
 };
 
-export const Affinities = {
-  Anima,
-  Dark,
-  Fire,
-  Ice,
-  Light,
-  Thunder,
-  Wind
-} as const;
-
 export const Months = {
   January: {
     bloodTypeAffinities: {
-      A: Affinities.Ice,
-      B: Affinities.Wind,
-      O: Affinities.Fire,
-      AB: Affinities.Ice
+      A: Ice,
+      B: Wind,
+      O: Fire,
+      AB: Ice
     }
   },
   February: {
     bloodTypeAffinities: {
-      A: Affinities.Wind,
-      B: Affinities.Fire,
-      O: Affinities.Thunder,
-      AB: Affinities.Anima
+      A: Wind,
+      B: Fire,
+      O: Thunder,
+      AB: Anima
     }
   },
   March: {
     bloodTypeAffinities: {
-      A: Affinities.Ice,
-      B: Affinities.Wind,
-      O: Affinities.Anima,
-      AB: Affinities.Thunder
+      A: Ice,
+      B: Wind,
+      O: Anima,
+      AB: Thunder
     }
   },
   April: {
     bloodTypeAffinities: {
-      A: Affinities.Anima,
-      B: Affinities.Fire,
-      O: Affinities.Thunder,
-      AB: Affinities.Ice
+      A: Anima,
+      B: Fire,
+      O: Thunder,
+      AB: Ice
     }
   },
   May: {
     bloodTypeAffinities: {
-      A: Affinities.Light,
-      B: Affinities.Thunder,
-      O: Affinities.Fire,
-      AB: Affinities.Wind
+      A: Light,
+      B: Thunder,
+      O: Fire,
+      AB: Wind
     }
   },
   June: {
     bloodTypeAffinities: {
-      A: Affinities.Thunder,
-      B: Affinities.Anima,
-      O: Affinities.Wind,
-      AB: Affinities.Fire
+      A: Thunder,
+      B: Anima,
+      O: Wind,
+      AB: Fire
     }
   },
   July: {
     bloodTypeAffinities: {
-      A: Affinities.Anima,
-      B: Affinities.Wind,
-      O: Affinities.Ice,
-      AB: Affinities.Thunder
+      A: Anima,
+      B: Wind,
+      O: Ice,
+      AB: Thunder
     }
   },
   August: {
     bloodTypeAffinities: {
-      A: Affinities.Wind,
-      B: Affinities.Dark,
-      O: Affinities.Fire,
-      AB: Affinities.Anima
+      A: Wind,
+      B: Dark,
+      O: Fire,
+      AB: Anima
     }
   },
   September: {
     bloodTypeAffinities: {
-      A: Affinities.Fire,
-      B: Affinities.Ice,
-      O: Affinities.Anima,
-      AB: Affinities.Thunder
+      A: Fire,
+      B: Ice,
+      O: Anima,
+      AB: Thunder
     }
   },
   October: {
     bloodTypeAffinities: {
-      A: Affinities.Ice,
-      B: Affinities.Anima,
-      O: Affinities.Wind,
-      AB: Affinities.Fire
+      A: Ice,
+      B: Anima,
+      O: Wind,
+      AB: Fire
     }
   },
   November: {
     bloodTypeAffinities: {
-      A: Affinities.Anima,
-      B: Affinities.Thunder,
-      O: Affinities.Ice,
-      AB: Affinities.Dark
+      A: Anima,
+      B: Thunder,
+      O: Ice,
+      AB: Dark
     }
   },
   December: {
     bloodTypeAffinities: {
-      A: Affinities.Thunder,
-      B: Affinities.Fire,
-      O: Affinities.Wind,
-      AB: Affinities.Light
+      A: Thunder,
+      B: Fire,
+      O: Wind,
+      AB: Light
     }
   }
 } as const;

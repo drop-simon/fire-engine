@@ -3,6 +3,7 @@ import { ConsumableItemConfig } from "./consumable";
 import { PromotionalItemConfig } from "./promotional";
 import { UnitDependantFunction, Unit, StatListType } from "../unit";
 import BattleManagementService from "../../services/BattleManagementService";
+import { MapManagedUnit } from "../../services/MapManagementService";
 
 type ItemCategory = "Weapon" | "Consumable" | "Promotional" | "Other";
 
@@ -19,10 +20,7 @@ export interface ItemBase {
   name: string;
   maxUses: number;
   numUses: number;
-  getCanUseInMap: (args?: {
-    battleManager: BattleManagementService;
-    unit: Unit;
-  }) => boolean;
+  getCanUseInMap: (mapManagedUnit?: MapManagedUnit) => boolean;
   getCanUseInOverworld: UnitDependantFunction<boolean>;
   cost: number;
 }

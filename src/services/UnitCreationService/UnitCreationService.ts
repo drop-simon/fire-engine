@@ -2,12 +2,13 @@ import {
   UnitConfig,
   StatGrowthRateListType,
   StatListType,
-  AnyUnitClassConfigType,
   CombatCategory
 } from "../../types";
-import { Months } from "../../constants";
+import * as Constants from "../../constants";
 import { createGrowthRates } from "./utils";
 import { increaseStats } from "../utils";
+
+const { Months } = Constants.Affinities;
 
 export default class UnitCreationService<C extends CombatCategory> {
   config: UnitConfig<C>;
@@ -31,7 +32,9 @@ export default class UnitCreationService<C extends CombatCategory> {
 
   private calculateAffinity() {
     const { birthMonth, bloodType } = this.config;
-    return Months[birthMonth].bloodTypeAffinities[bloodType];
+    return Months[birthMonth as keyof typeof Months].bloodTypeAffinities[
+      bloodType
+    ];
   }
 
   private createGrowthRates() {
