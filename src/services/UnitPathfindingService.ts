@@ -71,7 +71,7 @@ export default class UnitPathfindingService {
     this.currentCoordinates = coordinates;
     this.unitManager = unitManager;
 
-    mapManager.map.terrain.forEach((row, y) => {
+    this.mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
         const node = this.createDijkstraNode({ x, y });
         const tile = this.getTileInfo({ x, y });

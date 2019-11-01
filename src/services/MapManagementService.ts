@@ -13,7 +13,6 @@ export type MapTerrain = TerrainConfig[][];
 
 export interface MapManagementServiceConstructor {
   terrain: MapTerrain;
-  units: UnitCoordinates[];
   gameManager: GameManagementService;
 }
 
@@ -28,17 +27,12 @@ export default class MapManagementService {
   units: MapManagedUnit[] = [];
   chests: { coordinates: Coordinates; isOpened?: false }[] = [];
 
-  constructor({
-    terrain,
-    units,
-    gameManager
-  }: MapManagementServiceConstructor) {
-    this.addUnits(units);
+  constructor({ terrain, gameManager }: MapManagementServiceConstructor) {
     this.map = { terrain, ...getMapDimensions(terrain) };
     this.gameManager = gameManager;
   }
 
-  addUnit(unitCoordinates: UnitCoordinates) {
+  addUnit = (unitCoordinates: UnitCoordinates) => {
     const unitManager = new UnitManagementService({
       unitCoordinates,
       mapManager: this,
@@ -52,12 +46,12 @@ export default class MapManagementService {
     });
     this.units.push({ pathfinder, unitManager });
     return this;
-  }
+  };
 
-  addUnits(units: UnitCoordinates[]) {
+  addUnits = (units: UnitCoordinates[]) => {
     units.forEach(this.addUnit);
     return this;
-  }
+  };
 
   get enemyUnits() {
     return this.units.filter(
@@ -77,9 +71,9 @@ export default class MapManagementService {
     );
   }
 
-  getUnitAtCoordinates(coordinates: Coordinates) {
+  getUnitAtCoordinates = (coordinates: Coordinates) => {
     return this.units.find(({ pathfinder }) =>
       pathfinder.compareCoordinates(pathfinder.currentCoordinates, coordinates)
     );
-  }
+  };
 }

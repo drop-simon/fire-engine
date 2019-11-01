@@ -1,6 +1,6 @@
-import { Affinities } from "../constants";
+import { Months, Affinities } from "../constants";
 
-export type BirthMonthType = keyof typeof Affinities["Months"];
+export type BirthMonthType = keyof typeof Months;
 
 export type BloodType = "A" | "B" | "O" | "AB";
 

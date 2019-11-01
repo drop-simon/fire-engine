@@ -1,6 +1,7 @@
 import { UnitAllegiance } from "../../types";
 import MapManagementService from "../MapManagementService";
 import GameManagementService from "../GameManagementService";
+import EventEmitterService from "../EventEmitterService";
 
 type BattleGoalType = {
   description: string;
@@ -14,7 +15,14 @@ interface BattleManagementServiceConstructor {
   mapManager: MapManagementService;
 }
 
-export default class BattleManagementService {
+type BattleEvents = {
+  playerTurn: () => void;
+  enemyTurn: () => void;
+};
+
+export default class BattleManagementService extends EventEmitterService<
+  BattleEvents
+> {
   goal: BattleGoalType;
   mapManager: MapManagementService;
   gameManager: GameManagementService;
@@ -27,10 +35,22 @@ export default class BattleManagementService {
     gameManager,
     mapManager
   }: BattleManagementServiceConstructor) {
+    super();
     this.goal = goal;
     this.mapManager = mapManager;
     this.gameManager = gameManager;
   }
 
-  private processEnemyTurn() {}
+  start() {
+    this.processPlayerTurn();
+  }
+
+  private processPlayerTurn() {
+    this.emit("playerTurn");
+    this.processEnemyTurn();
+  }
+
+  private processEnemyTurn() {
+    this.emit("enemyTurn");
+  }
 }

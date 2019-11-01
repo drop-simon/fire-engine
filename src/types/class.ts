@@ -1,8 +1,8 @@
-import { Classes } from "../constants";
+import Constants from "../constants";
 import { CombatCategory } from "./item";
 import { ValueInObject } from "./util";
 
-export type AllUnitClasses = typeof Classes;
+export type AllUnitClasses = typeof Constants.Classes;
 
 export type MagicUnitClasses = AllUnitClasses["Magic"];
 export type PhysicalUnitClasses = AllUnitClasses["Physical"];

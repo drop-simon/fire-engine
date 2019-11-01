@@ -4,11 +4,9 @@ import {
   StatListType,
   CombatCategory
 } from "../../types";
-import * as Constants from "../../constants";
+import { Months } from "../../constants";
 import { createGrowthRates } from "./utils";
 import { increaseStats } from "../utils";
-
-const { Months } = Constants.Affinities;
 
 export default class UnitCreationService<C extends CombatCategory> {
   config: UnitConfig<C>;
