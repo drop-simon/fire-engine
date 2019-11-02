@@ -1,8 +1,8 @@
 import range from "lodash/range";
-import FireEngine from "./src";
-import GameManagementService from "./src/services/GameManagementService";
-import MapManagementService from "./src/services/MapManagementService";
-import BattleManagementService from "./src/services/BattleManagementService";
+import FireEngine from "../src";
+import GameManagementService from "../src/services/GameManagementService";
+import MapManagementService from "../src/services/MapManagementService";
+import BattleManagementService from "../src/services/BattleManagementService";
 const {
   Constants: {
     Items,
@@ -93,9 +93,8 @@ mapManager.addUnits([
   }
 ]);
 
-battleManager.addEventListener("playerTurn", () => {
-  const player = battleManager.mapManager.playerUnits[0];
-  const { walkableTiles } = player.pathfinder;
+const renderMap = () => {
+  console.clear();
   console.log(
     battleManager.mapManager.map.terrain
       .map((row, y) =>
@@ -115,60 +114,14 @@ battleManager.addEventListener("playerTurn", () => {
               return "ΨΨ";
             }
 
-            if (
-              walkableTiles.some(({ coordinates }) =>
-                player.pathfinder.compareCoordinates(coordinates, { x, y })
-              )
-            ) {
-              return "▒▒";
-            }
-
             return FLOOR_TILE;
           })
           .join(" ")
       )
       .join("\n")
   );
-  console.log("player turn!");
-});
+};
 
-battleManager.addEventListener("enemyTurn", () => {
-  const enemy = battleManager.mapManager.enemyUnits[0];
-  const { walkableTiles } = enemy.pathfinder;
-  console.log(
-    battleManager.mapManager.map.terrain
-      .map((row, y) =>
-        row
-          .map(({ name }, x) => {
-            const unit = battleManager.mapManager.units.find(
-              ({ pathfinder: { currentCoordinates } }) =>
-                currentCoordinates.x === x && currentCoordinates.y === y
-            );
-            if (unit) {
-              return unit.unitManager.allegiance === "PLAYER"
-                ? PLAYER_TILE
-                : ENEMY_TILE;
-            }
-
-            if (name === "thicket") {
-              return "ΨΨ";
-            }
-
-            if (
-              walkableTiles.some(({ coordinates }) =>
-                enemy.pathfinder.compareCoordinates(coordinates, { x, y })
-              )
-            ) {
-              return "▒▒";
-            }
-
-            return FLOOR_TILE;
-          })
-          .join(" ")
-      )
-      .join("\n")
-  );
-  console.log("enemy turn!");
-});
+battleManager.addEventListener("playerTurn", renderMap);
 
 battleManager.start();

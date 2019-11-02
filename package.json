@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "tsc",
-    "sandbox": "tsc && node dist/sandbox.js"
+    "sandbox": "tsc && node dist/test-game/sandbox.js"
   },
   "dependencies": {
     "lodash": "^4.17.15",
@@ -16,8 +16,14 @@
     "updeep": "^1.2.0"
   },
   "devDependencies": {
+    "@types/boxen": "^3.0.1",
+    "@types/chalk": "^2.2.0",
+    "@types/figlet": "^1.2.0",
     "@types/lodash": "^4.14.144",
     "@types/node-dijkstra": "^2.5.0",
+    "boxen": "^4.1.0",
+    "chalk": "^2.4.2",
+    "figlet": "^1.2.4",
     "ts-node-dev": "^1.0.0-pre.43"
   }
 }

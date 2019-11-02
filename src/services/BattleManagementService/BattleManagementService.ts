@@ -47,10 +47,11 @@ export default class BattleManagementService extends EventEmitterService<
 
   private processPlayerTurn() {
     this.emit("playerTurn");
-    this.processEnemyTurn();
   }
 
   private processEnemyTurn() {
     this.emit("enemyTurn");
   }
+
+  private endTurn() {}
 }

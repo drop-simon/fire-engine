@@ -28,18 +28,8 @@ const ADJACENT_TILE_INDICES = [
   { x: 0, y: 1 }
 ] as const;
 
-type CommitToPath = (
-  path: TerrainWithKey[],
-  iterator?: (args: {
-    tile: TerrainWithKey;
-    index: number;
-    next: () => void;
-    abort: () => void;
-  }) => any
-) => Promise<void> | void;
-
 type GetPathTo = (args: {
-  start: Coordinates;
+  start?: Coordinates;
   end: Coordinates;
   uninterrupted?: boolean;
   graph?: Graph;
@@ -139,7 +129,7 @@ export default class UnitPathfindingService {
   }
 
   getPathTo: GetPathTo = ({
-    start,
+    start = this.currentCoordinates,
     end,
     uninterrupted = false,
     graph = this.graph
@@ -174,28 +164,10 @@ export default class UnitPathfindingService {
     return mappedPath;
   };
 
-  commitToPath: CommitToPath = (path, iterator) => {
-    if (!iterator) {
-      this.currentCoordinates = path[path.length - 1].coordinates;
-      return;
-    }
-
-    return new Promise(resolve => {
-      let shouldAbort = false;
-      let index = -1;
-      const abort = () => (shouldAbort = true);
-      const next = () => {
-        index++;
-        if (shouldAbort || index === path.length) {
-          this.currentCoordinates = path[index - 1].coordinates;
-          resolve();
-          return;
-        }
-        const tile = path[index];
-        iterator({ tile, index, next, abort });
-      };
-      next();
-    });
+  commitToPath = (path: MapTileInformation[]) => {
+    // TODO: FOG OF WAR INTERRUPTING PATH
+    this.currentCoordinates = path[path.length - 1].coordinates;
+    this.emitMovement(path);
   };
 
   getAdjacentTiles = (coordinates: Coordinates) =>
@@ -237,6 +209,10 @@ export default class UnitPathfindingService {
 
   compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
     return this.createTileKey(coordsA) === this.createTileKey(coordsB);
+  }
+
+  private emitMovement(path: MapTileInformation[]) {
+    this.mapManager.emit("moveUnit", { path, unit: this.unitManager });
   }
 
   private getTargetableTiles({ friendly }: { friendly: boolean }) {
