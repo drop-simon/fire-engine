@@ -1,17 +1,8 @@
-import u from "updeep";
-import isEqual from "lodash/isEqual";
-import {
-  WeaponType,
-  Unit,
-  UnitAllegiance,
-  UnitBehavior,
-  Item
-} from "../../../types";
+import { WeaponType, Unit, UnitAllegiance, UnitBehavior } from "../../../types";
 import { increaseStats } from "../../utils";
 import GameManagementService from "../../GameManagementService";
 import MapManagementService from "../../MapManagementService";
 import { Coordinates } from "../../UnitPathfindingService";
-import { DeepPartial } from "../../../types/util";
 
 export type UnitCoordinates = {
   unit: Unit;
@@ -28,10 +19,10 @@ interface UnitManagementServiceConfig {
 
 export default class UnitManagementService {
   unit: Unit;
-  behavior: UnitBehavior;
   allegiance: UnitAllegiance;
   gameManager: GameManagementService;
   mapManager: MapManagementService;
+  behavior: UnitBehavior = "PASSIVE";
 
   constructor({
     unitCoordinates: { unit, allegiance, behavior },
@@ -42,6 +33,9 @@ export default class UnitManagementService {
     this.allegiance = allegiance;
     this.gameManager = gameManager;
     this.mapManager = mapManager;
+    if (behavior) {
+      this.behavior = behavior;
+    }
   }
 
   levelUp() {
@@ -113,7 +107,7 @@ export default class UnitManagementService {
   }
 
   get attackRanges() {
-    return this.equippableSupportWeapons.map(w => w.range);
+    return this.equippableAttackWeapons.map(w => w.range);
   }
 
   get damageTaken() {

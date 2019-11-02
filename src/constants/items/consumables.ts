@@ -205,13 +205,13 @@ export const Lockpick: ConsumableItemConfig = {
   maxUses: 15,
   category: "Consumable",
   effect: { permanent: { movement: 2 } },
-  getCanUseInMap: ({ unitManager, pathfinder }) => {
+  getCanUseInMap: ({ unitManager, pathfinder, allegiance }) => {
     if (unitManager.unit.base.name !== "Thief") {
       return false;
     }
     return (
-      DoorKey.getCanUseInMap({ unitManager, pathfinder }) ||
-      ChestKey.getCanUseInMap({ unitManager, pathfinder })
+      DoorKey.getCanUseInMap({ unitManager, pathfinder, allegiance }) ||
+      ChestKey.getCanUseInMap({ unitManager, pathfinder, allegiance })
     );
   },
   getCanUseInOverworld: () => false,

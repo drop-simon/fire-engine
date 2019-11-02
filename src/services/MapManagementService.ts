@@ -3,12 +3,13 @@ import UnitPathfindingService, {
   Coordinates,
   TerrainWithKey
 } from "./UnitPathfindingService";
-import { TerrainConfig } from "../types";
+import { TerrainConfig, UnitAllegiance } from "../types";
 import GameManagementService from "./GameManagementService";
 import { getMapDimensions } from "./utils";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import { UnitCoordinates } from "./BattleManagementService/UnitManagementService/UnitManagementService";
 import EventEmitterService from "./EventEmitterService";
+import UnitBehaviorService from "./BattleManagementService/UnitManagementService/UnitBehaviorService";
 
 export type MapTileInformation = ReturnType<
   UnitPathfindingService["getTileInfo"]
@@ -24,6 +25,7 @@ export interface MapManagementServiceConstructor {
 export type MapManagedUnit = {
   unitManager: UnitManagementService;
   pathfinder: UnitPathfindingService;
+  allegiance: UnitAllegiance;
 };
 
 type MapEvents = {
@@ -106,7 +108,11 @@ export default class MapManagementService extends EventEmitterService<
       mapManager: this,
       gameManager: this.gameManager
     });
-    const mapManagedUnit = { pathfinder, unitManager };
+    const mapManagedUnit = {
+      pathfinder,
+      unitManager,
+      allegiance: unitManager.allegiance
+    };
     this.units.push(mapManagedUnit);
     return mapManagedUnit;
   };

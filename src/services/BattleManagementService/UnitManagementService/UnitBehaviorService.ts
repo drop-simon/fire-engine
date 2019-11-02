@@ -65,11 +65,7 @@ export default class UnitBehaviorService {
     }
   }
 
-  get battle() {
-    return this.battleManager;
-  }
-
-  get map() {
+  get mapManager() {
     return this.battleManager.mapManager;
   }
 
@@ -79,6 +75,18 @@ export default class UnitBehaviorService {
 
   get unitManager() {
     return this.mapManagedUnit.unitManager;
+  }
+
+  get enemyUnits() {
+    return this.mapManager.units.filter(
+      unit => !areUnitsAllied(unit.unitManager, this.unitManager)
+    );
+  }
+
+  get alliedUnits() {
+    return this.mapManager.units.filter(unit =>
+      areUnitsAllied(unit.unitManager, this.unitManager)
+    );
   }
 
   handleStationaryBehavior() {
@@ -120,19 +128,8 @@ export default class UnitBehaviorService {
   }
 
   handleActiveBehavior() {
-    const attackableUnits = this.pathfinder.attackableTiles
-      .filter(
-        tile =>
-          tile.unit &&
-          !areUnitsAllied(
-            tile.unit.unitManager,
-            this.mapManagedUnit.unitManager
-          )
-      )
-      .map(({ unit }) => unit);
-
     const target = sortBy(
-      attackableUnits,
+      this.enemyUnits,
       unit =>
         compareConflictStats({
           aggressor: this.mapManagedUnit,
@@ -146,7 +143,7 @@ export default class UnitBehaviorService {
     }
 
     const { attackRanges } = this.unitManager;
-    const possibleTiles = this.pathfinder.walkableTiles.filter(tile => {
+    const possibleTiles = this.pathfinder.processedTiles.filter(tile => {
       const distance = getManhattanDistance(
         tile.coordinates,
         target.pathfinder.currentCoordinates
@@ -155,6 +152,11 @@ export default class UnitBehaviorService {
         ([min, max]) => distance <= max && distance >= min
       );
     });
+    if (possibleTiles.length < 1) {
+      console.log("Cant find path to tile to attack target from");
+      return this.handleStationaryBehavior();
+    }
+
     const targetTile = sortBy(
       possibleTiles,
       tile => getTerrainSafety(tile.terrain),
@@ -173,7 +175,7 @@ export default class UnitBehaviorService {
   handlePassiveBehavior() {}
 
   handleSupportBehavior() {
-    const attackableUnits = this.pathfinder.friendlyFireTiles
+    const targetableUnits = this.pathfinder.friendlyFireTiles
       .filter(
         tile =>
           tile.unit &&
@@ -182,7 +184,7 @@ export default class UnitBehaviorService {
       .map(({ unit }) => unit);
 
     const target = sortBy(
-      attackableUnits,
+      targetableUnits,
       unit => unit.unitManager.calculatedStats.health
     )[0];
 
@@ -215,7 +217,9 @@ export default class UnitBehaviorService {
   }
 
   handleThiefBehavior() {
-    const unopenedChests = this.map.chests.filter(({ isOpened }) => !isOpened);
+    const unopenedChests = this.mapManager.chests.filter(
+      ({ isOpened }) => !isOpened
+    );
     const shortestPathToChest = unopenedChests.reduce(
       (acc, { coordinates }) => {
         const path = this.getPathToTile(coordinates);
@@ -259,7 +263,6 @@ export default class UnitBehaviorService {
 
   private getPathToTile(coordinates: Coordinates) {
     return this.pathfinder.getPathTo({
-      start: this.pathfinder.currentCoordinates,
       end: coordinates
     });
   }

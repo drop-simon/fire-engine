@@ -21,7 +21,7 @@ const Calypso = new UnitCreationService({
   bloodType: "A",
   sex: "F",
   items: [Items.Weapons.SilverAxe],
-  weaponLevels: [{ specialty: "Lances", level: "A" }],
+  weaponLevels: [{ specialty: "Axes", level: "A" }],
   supports: {},
   base: Lord
 }).process();
@@ -96,11 +96,11 @@ mapManager.addUnits([
 const renderMap = () => {
   console.clear();
   console.log(
-    battleManager.mapManager.map.terrain
+    battleManager.map.terrain
       .map((row, y) =>
         row
           .map(({ name }, x) => {
-            const unit = battleManager.mapManager.units.find(
+            const unit = battleManager.units.find(
               ({ pathfinder: { currentCoordinates } }) =>
                 currentCoordinates.x === x && currentCoordinates.y === y
             );
@@ -122,6 +122,14 @@ const renderMap = () => {
   );
 };
 
-battleManager.addEventListener("playerTurn", renderMap);
+// setTimeout(() => {
+// const player = battleManager.playerUnits[0];
+const enemy = battleManager.enemyUnits[0];
+const enemyBehavior = battleManager.getUnitBehaviorFromCoordinates(
+  enemy.pathfinder.currentCoordinates
+);
 
-battleManager.start();
+renderMap();
+const enemyAction = enemyBehavior.process();
+console.log(enemyAction);
+// }, 1000);

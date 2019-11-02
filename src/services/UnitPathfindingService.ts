@@ -1,7 +1,12 @@
 import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import uniqBy from "lodash/uniqBy";
-import { TerrainConfig, UnitAllegiance, WeaponType } from "../types";
+import {
+  TerrainConfig,
+  UnitAllegiance,
+  WeaponType,
+  UnitBehavior
+} from "../types";
 import MapManagementService, {
   MapTileInformation
 } from "./MapManagementService";
@@ -10,6 +15,7 @@ import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import merge from "lodash/merge";
 import { areUnitsAllied } from "./BattleManagementService/UnitManagementService/utils";
+import UnitBehaviorService from "./BattleManagementService/UnitManagementService/UnitBehaviorService";
 
 export type Coordinates = {
   x: number;
@@ -35,6 +41,13 @@ type GetPathTo = (args: {
   graph?: Graph;
 }) => MapTileInformation[];
 
+type UnitPathfindingServiceConstructor = {
+  gameManager: GameManagementService;
+  mapManager: MapManagementService;
+  unitManager: UnitManagementService;
+  coordinates: Coordinates;
+};
+
 export default class UnitPathfindingService {
   gameManager: GameManagementService;
   mapManager: MapManagementService;
@@ -50,16 +63,12 @@ export default class UnitPathfindingService {
     gameManager,
     coordinates,
     unitManager
-  }: {
-    gameManager: GameManagementService;
-    mapManager: MapManagementService;
-    unitManager: UnitManagementService;
-    coordinates: Coordinates;
-  }) {
+  }: UnitPathfindingServiceConstructor) {
     this.gameManager = gameManager;
     this.mapManager = mapManager;
     this.currentCoordinates = coordinates;
     this.unitManager = unitManager;
+    this.allegiance = unitManager.allegiance;
 
     this.mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
@@ -207,9 +216,8 @@ export default class UnitPathfindingService {
     };
   }
 
-  compareCoordinates(coordsA: Coordinates, coordsB: Coordinates) {
-    return this.createTileKey(coordsA) === this.createTileKey(coordsB);
-  }
+  compareCoordinates = (coordsA: Coordinates, coordsB: Coordinates) =>
+    this.createTileKey(coordsA) === this.createTileKey(coordsB);
 
   private emitMovement(path: MapTileInformation[]) {
     this.mapManager.emit("moveUnit", { path, unit: this.unitManager });
