@@ -1,4 +1,5 @@
 import range from "lodash/range";
+import last from "lodash/last";
 import FireEngine from "../src";
 import GameManagementService from "../src/services/GameManagementService";
 import MapManagementService from "../src/services/MapManagementService";
@@ -17,8 +18,8 @@ const {
 const Calypso = new UnitCreationService({
   level: 15,
   name: "Calypso",
-  birthMonth: "September",
-  bloodType: "A",
+  birthMonth: "March",
+  bloodType: "B",
   sex: "F",
   items: [Items.Weapons.SilverAxe],
   weaponLevels: [{ specialty: "Axes", level: "A" }],
@@ -29,8 +30,8 @@ const Calypso = new UnitCreationService({
 const Artemis = new UnitCreationService({
   level: 17,
   name: "Artemis",
-  birthMonth: "June",
-  bloodType: "AB",
+  birthMonth: "August",
+  bloodType: "O",
   sex: "M",
   items: [Items.Weapons.SilverAxe],
   weaponLevels: [{ specialty: "Axes", level: "A" }],
@@ -84,7 +85,7 @@ const battleManager = new BattleManagementService({
 });
 
 mapManager.addUnits([
-  { coordinates: { x: 0, y: 0 }, unit: Artemis, allegiance: "PLAYER" },
+  { coordinates: { x: 0, y: 0 }, unit: Calypso, allegiance: "PLAYER" },
   {
     coordinates: { x: 6, y: 5 },
     unit: Artemis,
@@ -93,8 +94,10 @@ mapManager.addUnits([
   }
 ]);
 
+const logs: string[] = ["Enemy AI test begin"];
+
 const renderMap = () => {
-  // console.clear();
+  console.clear();
   console.log(
     battleManager.map.terrain
       .map((row, y) =>
@@ -120,6 +123,7 @@ const renderMap = () => {
       )
       .join("\n")
   );
+  console.log(logs.join("\n"));
 };
 
 // setTimeout(() => {
@@ -129,42 +133,58 @@ const enemyBehavior = battleManager.getUnitBehaviorFromCoordinates(
   enemy.pathfinder.currentCoordinates
 );
 
-renderMap();
-
 mapManager.addEventListener("moveUnit", ({ unit, path }) => {
-  path.forEach((step, i) => {
-    setTimeout(() => {
-      unit.pathfinder.currentCoordinates = step.coordinates;
-      // renderMap();
-    }, (i + 1) * 300);
-  });
+  const coords = JSON.stringify(last(path).coordinates);
+  logs.push(`${unit.unitManager.unit.name} moves to ${coords}`);
+  renderMap();
 });
 
-mapManager.addEventListener("conflict", results =>
+mapManager.addEventListener("conflict", results => {
   results.forEach(
-    ({ config: { participant }, didMove, didHit, didCritical, damage }) => {
-      const unitName = participant.unitManager.unit.name;
+    ({
+      config: { aggressor, defender },
+      didMove,
+      didHit,
+      didCritical,
+      damage
+    }) => {
+      const unitName = aggressor.unitManager.unit.name;
       if (didMove) {
-        console.log(`${unitName} attacks.`);
+        logs.push(`${unitName} attacks.`);
 
         if (didHit) {
-          const message = `${unitName} deals ${damage}${
+          const message = `${unitName} deals ${damage} damage${
             didCritical ? " with a critical hit!!" : ""
           }!`;
-          console.log(message);
+          logs.push(message);
+
+          const defenderHealth = defender.unitManager.calculatedStats.health;
+          const defenderName = defender.unitManager.unit.name;
+          logs.push(`${defenderName} has ${defenderHealth} health remaining.`);
+          if (defenderHealth < 1) {
+            console.log(`${defenderName} has died.`);
+          }
         } else {
-          console.log("The attack missed!");
+          logs.push("The attack missed!");
         }
       } else {
-        console.log(`${unitName} doesn't move.`);
+        logs.push(`${unitName} takes no action.`);
       }
     }
-  )
-);
-
-enemyBehavior.process();
-enemyBehavior.process();
-enemyBehavior.process();
-// }, 1000);
+  );
+  renderMap();
+});
 
 renderMap();
+
+setTimeout(() => {
+  enemyBehavior.process();
+}, 2000);
+
+setTimeout(() => {
+  enemyBehavior.process();
+}, 4000);
+
+setTimeout(() => {
+  enemyBehavior.process();
+}, 6000);

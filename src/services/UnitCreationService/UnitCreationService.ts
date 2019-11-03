@@ -5,7 +5,7 @@ import {
   CombatCategory
 } from "../../types";
 import { Months } from "../../constants";
-import { createGrowthRates } from "./utils";
+import { createGrowthRates, getStartingHealth } from "./utils";
 import { increaseStats } from "../utils";
 
 export default class UnitCreationService<C extends CombatCategory> {
@@ -47,8 +47,9 @@ export default class UnitCreationService<C extends CombatCategory> {
     growthRates: StatGrowthRateListType;
     level: number;
   }) => {
+    const { birthMonth, bloodType } = this.config;
     let stats: StatListType = {
-      health: 5,
+      health: getStartingHealth({ bloodType, birthMonth }),
       power: 0,
       skill: 0,
       speed: 0,

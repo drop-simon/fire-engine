@@ -30,7 +30,7 @@ export default class UnitManagementService {
   gameManager: GameManagementService;
   mapManager: MapManagementService;
   behavior: UnitBehavior = "PASSIVE";
-  damageTaken: number;
+  damageTaken: number = 0;
 
   constructor({
     unitCoordinates: { unit, allegiance, behavior },

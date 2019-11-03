@@ -78,7 +78,6 @@ export default class UnitBehaviorService {
   handleActiveBehavior() {
     const nearestEnemy = this.pathfinder.nearestEnemy;
     if (!nearestEnemy) {
-      console.log("no enemy to target");
       return;
     }
 
@@ -89,6 +88,7 @@ export default class UnitBehaviorService {
       )
       .reduce(
         (acc, tile) => {
+          // if we find a path that is only space away, we dont need to keep calculating paths
           if (acc && acc.length < 2) {
             return acc;
           }
@@ -108,7 +108,6 @@ export default class UnitBehaviorService {
       );
 
     if (!pathToTile) {
-      console.log("no path");
       return;
     }
 
@@ -119,7 +118,6 @@ export default class UnitBehaviorService {
       .find(tile => tile.unit);
 
     if (!target) {
-      console.log("no target");
       return;
     }
 

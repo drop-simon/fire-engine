@@ -176,29 +176,16 @@ export default class UnitPathfindingService {
   getAttackableTilesFromCoordinates(coordinates: Coordinates) {
     const { attackRanges } = this.unitManager;
 
-    return attackRanges.reduce(
-      (acc, [min, max]) => {
-        range(min, max + 1).forEach(distance => {
-          const addX = coordinates.x + distance;
-          const addY = coordinates.y + distance;
-          const subX = coordinates.x - distance;
-          const subY = coordinates.y - distance;
-
-          const updates = compact(
-            [
-              { x: addX, y: addY },
-              { x: addX, y: subY },
-              { x: subX, y: addY },
-              { x: subX, y: subY }
-            ].map(this.getTileInfo)
-          );
-
-          acc.push(...updates);
-        });
-        return acc;
-      },
-      [] as MapTileInformation[]
-    );
+    return this.processedTiles.filter(tile => {
+      const distanceFromCoordinates = getManhattanDistance(
+        tile.coordinates,
+        coordinates
+      );
+      return attackRanges.some(
+        ([min, max]) =>
+          distanceFromCoordinates <= max && distanceFromCoordinates >= min
+      );
+    });
   }
 
   getPathTo: GetPathTo = ({

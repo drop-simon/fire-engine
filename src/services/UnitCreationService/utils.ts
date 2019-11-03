@@ -1,7 +1,7 @@
 import sample from "lodash/sample";
 import { BirthMonthType, BloodType, StatGrowthRateListType } from "../../types";
 
-const BLOOD_TYPE_MODIFIERS = {
+export const BLOOD_TYPE_MODIFIERS = {
   A: {
     BENEFIT: ["speed", "power", "health", "luck"],
     DETRIMENT: ["skill", "defense", "resistance"]
@@ -18,9 +18,9 @@ const BLOOD_TYPE_MODIFIERS = {
     BENEFIT: ["power", "defense", "resistance", "skill"],
     DETRIMENT: ["health", "luck", "speed"]
   }
-} as const;
+};
 
-const BIRTH_MONTH_MODIFIERS = {
+export const BIRTH_MONTH_MODIFIERS = {
   January: {
     BENEFIT: ["luck", "skill"],
     DETRIMENT: ["health", "defense"]
@@ -69,9 +69,9 @@ const BIRTH_MONTH_MODIFIERS = {
     BENEFIT: ["resistance", "defense"],
     DETRIMENT: ["speed", "health"]
   }
-} as const;
+};
 
-const BASE_GROWTH_RATE = 0.5;
+const BASE_GROWTH_RATE = 0.6;
 const GROWTH_RATE_MODIFIERS = [0.05, 0.1, 0.15, 0.2];
 
 const getBeneficialGrowthModifier = () => sample(GROWTH_RATE_MODIFIERS);
@@ -86,7 +86,7 @@ export const createGrowthRates = ({
   bloodType: BloodType;
 }) => {
   const growthRates = {
-    health: BASE_GROWTH_RATE,
+    health: 0.8,
     power: BASE_GROWTH_RATE,
     skill: BASE_GROWTH_RATE,
     speed: BASE_GROWTH_RATE,
@@ -105,18 +105,56 @@ export const createGrowthRates = ({
     birthMonthMods.DETRIMENT
   );
 
-  benefitStats.forEach(stat => {
+  benefitStats.forEach((stat: keyof typeof growthRates) => {
     growthRates[stat] = Math.min(
       growthRates[stat] + getBeneficialGrowthModifier(),
-      0.85
+      0.9
     );
   });
-  detrimentStats.forEach(stat => {
+  detrimentStats.forEach((stat: keyof typeof growthRates) => {
     growthRates[stat] = Math.max(
       growthRates[stat] + getDetrimentalGrowthModifier(),
-      0.15
+      0.3
     );
   });
 
   return growthRates as StatGrowthRateListType;
+};
+
+export const getStartingHealth = ({
+  birthMonth,
+  bloodType
+}: {
+  birthMonth: BirthMonthType;
+  bloodType: BloodType;
+}) => {
+  let i = 2;
+
+  const startingHealthRanges = [
+    [8, 9], // super detriment
+    [10, 11], // detriment
+    [12, 13, 14], // neutral
+    [15, 16], // benefit
+    [17, 18] // super benefit
+  ];
+
+  const bloodTypeBenefits = BLOOD_TYPE_MODIFIERS[bloodType].BENEFIT;
+  const bloodTypeDetriments = BLOOD_TYPE_MODIFIERS[bloodType].DETRIMENT;
+  if (bloodTypeBenefits.includes("health")) {
+    i = Math.max(0, i - 1);
+  }
+  if (bloodTypeDetriments.includes("health")) {
+    i = Math.max(0, i - 1);
+  }
+
+  const birthMonthBenefits = BIRTH_MONTH_MODIFIERS[birthMonth].BENEFIT;
+  const birthMonthDetriments = BIRTH_MONTH_MODIFIERS[birthMonth].DETRIMENT;
+  if (birthMonthBenefits.includes("health")) {
+    i = Math.min(4, i + 1);
+  }
+  if (birthMonthDetriments.includes("health")) {
+    i = Math.min(4, i + 1);
+  }
+
+  return sample(startingHealthRanges[i]);
 };

@@ -62,13 +62,11 @@ export default class ConflictProcessingService {
         }
 
         const {
-          config: { target },
+          config: { defender },
           damage,
           didHit,
           didMove
         } = result;
-
-        const defender = target === "defender" ? this.aggressor : this.defender;
 
         if (didMove && didHit) {
           const defenderHealth = defender.unitManager.unit.stats.health;
@@ -107,13 +105,14 @@ export default class ConflictProcessingService {
   }
 
   createParticipantConfig(target: Target) {
-    const { aggressor } = this.getParticipants(target);
+    const { aggressor, defender } = this.getParticipants(target);
     return {
       damage: this.getDamage(target),
       accuracy: this.getAccuracy(target),
       critical: this.getCritical(target),
-      participant: aggressor,
-      target
+      target,
+      aggressor,
+      defender
     };
   }
 

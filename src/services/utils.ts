@@ -4,7 +4,7 @@ import { Coordinates } from "./UnitPathfindingService";
 
 // probability is a float between 0 and 1
 export const getProbabilityResult = (probability: number) =>
-  Math.round(Math.random() * 100) / 100 < probability;
+  Number(Math.random().toPrecision(2)) < probability;
 
 export const increaseStats = ({
   currentStats,
