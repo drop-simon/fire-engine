@@ -1,3 +1,5 @@
+import merge from "lodash/merge";
+import range from "lodash/range";
 import Graph from "node-dijkstra";
 import compact from "lodash/compact";
 import { TerrainConfig, UnitAllegiance } from "../types";
@@ -8,7 +10,6 @@ import MapManagementService, {
 import { getManhattanDistance } from "./utils";
 import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
-import merge from "lodash/merge";
 import { areUnitsAllied } from "./BattleManagementService/UnitManagementService/utils";
 
 export type Coordinates = {
@@ -51,7 +52,6 @@ export default class UnitPathfindingService {
   graph = new Graph();
   unitManager: UnitManagementService;
   allegiance: UnitAllegiance;
-  mapManagedUnit: MapManagedUnit;
 
   constructor({
     mapManager,
@@ -64,11 +64,6 @@ export default class UnitPathfindingService {
     this.currentCoordinates = coordinates;
     this.unitManager = unitManager;
     this.allegiance = unitManager.allegiance;
-    this.mapManagedUnit = {
-      pathfinder: this,
-      unitManager,
-      allegiance: unitManager.allegiance
-    };
 
     this.mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
@@ -82,6 +77,18 @@ export default class UnitPathfindingService {
         this.processedTiles.push(tile);
       });
     });
+  }
+
+  get enemyUnits() {
+    return this.mapManager.units.filter(
+      unit => !areUnitsAllied(unit.unitManager, this.unitManager)
+    );
+  }
+
+  get alliedUnits() {
+    return this.mapManager.units.filter(unit =>
+      areUnitsAllied(unit.unitManager, this.unitManager)
+    );
   }
 
   get walkableTiles() {
@@ -128,28 +135,70 @@ export default class UnitPathfindingService {
     );
   }
 
-  get friendlyFireTiles() {
-    return this.getTargetableTiles({ friendly: true });
+  get attackRange() {
+    const checkedTiles: { [key: string]: true } = {};
+    return this.walkableTiles.reduce(
+      (acc, tile) => {
+        const key = this.createTileKey(tile.coordinates);
+        if (checkedTiles[key]) {
+          return acc;
+        }
+      },
+      [] as MapTileInformation[]
+    );
   }
 
-  get attackableTiles() {
-    return this.getTargetableTiles({ friendly: false });
+  get nearestEnemy() {
+    return this.enemyUnits.reduce(
+      (acc, unit) => {
+        if (!acc) {
+          return unit;
+        }
+
+        const distanceFromUnit = getManhattanDistance(
+          unit.pathfinder.currentCoordinates,
+          this.currentCoordinates
+        );
+        const distanceFromNearest = getManhattanDistance(
+          acc.pathfinder.currentCoordinates,
+          this.currentCoordinates
+        );
+        if (distanceFromUnit < distanceFromNearest) {
+          return unit;
+        }
+
+        return acc;
+      },
+      null as MapManagedUnit
+    );
   }
 
-  get attackableEnemiesFromCurrentCoordinates() {
+  getAttackableTilesFromCoordinates(coordinates: Coordinates) {
     const { attackRanges } = this.unitManager;
-    const enemies = ["PLAYER", "NEUTRAL"].includes(this.allegiance)
-      ? this.mapManager.enemyUnits
-      : [...this.mapManager.playerUnits, ...this.mapManager.neutralUnits];
-    return enemies.filter(enemy => {
-      const distanceFromUnit = getManhattanDistance(
-        this.mapManagedUnit.pathfinder.currentCoordinates,
-        enemy.pathfinder.currentCoordinates
-      );
-      return attackRanges.some(
-        ([min, max]) => distanceFromUnit <= max && distanceFromUnit >= min
-      );
-    });
+
+    return attackRanges.reduce(
+      (acc, [min, max]) => {
+        range(min, max + 1).forEach(distance => {
+          const addX = coordinates.x + distance;
+          const addY = coordinates.y + distance;
+          const subX = coordinates.x - distance;
+          const subY = coordinates.y - distance;
+
+          const updates = compact(
+            [
+              { x: addX, y: addY },
+              { x: addX, y: subY },
+              { x: subX, y: addY },
+              { x: subX, y: subY }
+            ].map(this.getTileInfo)
+          );
+
+          acc.push(...updates);
+        });
+        return acc;
+      },
+      [] as MapTileInformation[]
+    );
   }
 
   getPathTo: GetPathTo = ({
@@ -202,7 +251,7 @@ export default class UnitPathfindingService {
       )
     );
 
-  getTileInfo({ x, y }: Coordinates) {
+  getTileInfo = ({ x, y }: Coordinates) => {
     const row = this.mapManager.map.terrain[y];
     if (!row) {
       return null;
@@ -213,7 +262,8 @@ export default class UnitPathfindingService {
     }
 
     const { getUnitModifications, ...baseTerrain } = terrainConfig;
-    const mapManagedUnit = this.mapManager.getUnitAtCoordinates({ x, y });
+    const getUnit = (coords: Coordinates) =>
+      this.mapManager.getUnitAtCoordinates(coords);
 
     return {
       terrain: {
@@ -223,42 +273,19 @@ export default class UnitPathfindingService {
           getUnitModifications(this.unitManager.unit)
         )
       },
-      unit: mapManagedUnit,
+      get unit() {
+        return getUnit({ x, y });
+      },
       chest: this.mapManager.chests.find(({ coordinates }) =>
         this.compareCoordinates(coordinates, { x, y })
       ),
       key: this.createTileKey({ x, y }),
       coordinates: { x, y }
     };
-  }
+  };
 
   compareCoordinates = (coordsA: Coordinates, coordsB: Coordinates) =>
     this.createTileKey(coordsA) === this.createTileKey(coordsB);
-
-  private getTargetableTiles({ friendly }: { friendly: boolean }) {
-    const conflictRanges = this.unitManager[
-      friendly ? "supportRanges" : "attackRanges"
-    ];
-    if (conflictRanges.length < 1) {
-      return [];
-    }
-
-    const { walkableTiles } = this;
-    const targetableTiles = this.processedTiles.filter(processedTile =>
-      walkableTiles.some(walkableTile => {
-        const distance = getManhattanDistance(
-          processedTile.coordinates,
-          walkableTile.coordinates
-        );
-
-        return conflictRanges.some(
-          ([min, max]) => distance >= min && distance <= max
-        );
-      })
-    );
-
-    return targetableTiles;
-  }
 
   private get nonTraversableTiles() {
     return this.processedTiles

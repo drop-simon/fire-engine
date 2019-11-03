@@ -73,86 +73,60 @@ export default class UnitBehaviorService {
     return this.mapManagedUnit.unitManager;
   }
 
-  get enemyUnits() {
-    return this.mapManager.units.filter(
-      unit => !areUnitsAllied(unit.unitManager, this.unitManager)
-    );
-  }
-
-  get alliedUnits() {
-    return this.mapManager.units.filter(unit =>
-      areUnitsAllied(unit.unitManager, this.unitManager)
-    );
-  }
-
   handleStationaryBehavior() {}
 
   handleActiveBehavior() {
-    const enemiesSortedByStrength = sortBy(
-      this.enemyUnits,
-      unit =>
-        compareConflictStats({
-          aggressor: this.mapManagedUnit,
-          defender: unit
-        }),
-      "desc"
-    );
-    const target = enemiesSortedByStrength[0];
-    if (!target) {
-      console.log("no target");
+    const nearestEnemy = this.pathfinder.nearestEnemy;
+    if (!nearestEnemy) {
+      console.log("no enemy to target");
       return;
     }
 
-    const { attackRanges } = this.unitManager;
-    const possibleAttackSourceTiles = this.pathfinder.processedTiles.filter(
-      tile => {
-        const distanceFromTarget = getManhattanDistance(
-          target.pathfinder.currentCoordinates,
-          tile.coordinates
-        );
-        return attackRanges.some(
-          ([min, max]) => distanceFromTarget >= min && distanceFromTarget <= max
-        );
-      }
-    );
+    // get nearest tile nearestEnemy can be attacked from
+    const pathToTile = this.pathfinder
+      .getAttackableTilesFromCoordinates(
+        nearestEnemy.pathfinder.currentCoordinates
+      )
+      .reduce(
+        (acc, tile) => {
+          if (acc && acc.length < 2) {
+            return acc;
+          }
 
-    if (possibleAttackSourceTiles.length < 1) {
-      console.log("Cant find path to tile to attack target from");
-      return;
-    }
+          const path = this.pathfinder.getPathTo({ end: tile.coordinates });
+          if (!path) {
+            return acc;
+          }
 
-    const targetTile = sortBy(
-      possibleAttackSourceTiles,
-      tile => getTerrainSafety(tile.terrain),
-      "desc"
-    )[0];
+          if (!acc || (path.length > 0 && path.length < acc.length)) {
+            return path;
+          }
 
-    const pathToTile = this.getPathToTile(targetTile.coordinates);
+          return acc;
+        },
+        null as MapTileInformation[]
+      );
+
     if (!pathToTile) {
       console.log("no path");
       return;
     }
 
-    console.log("moving to coords");
     this.mapManager.moveUnit(this.mapManagedUnit, pathToTile);
 
-    if (
-      this.pathfinder.compareCoordinates(
-        last(pathToTile).coordinates,
-        targetTile.coordinates
-      )
-    ) {
-      const target = this.pathfinder.attackableEnemiesFromCurrentCoordinates[0];
-      if (!target) {
-        console.log("no target");
-        return;
-      }
+    const target = this.pathfinder
+      .getAttackableTilesFromCoordinates(this.pathfinder.currentCoordinates)
+      .find(tile => tile.unit);
 
-      this.mapManager.conflict({
-        defender: target,
-        aggressor: this.mapManagedUnit
-      });
+    if (!target) {
+      console.log("no target");
+      return;
     }
+
+    this.mapManager.conflict({
+      defender: target.unit,
+      aggressor: this.mapManagedUnit
+    });
   }
 
   handlePassiveBehavior() {}
@@ -171,11 +145,5 @@ export default class UnitBehaviorService {
 
     this.mapManager.unitUseItem(this.mapManagedUnit, itemToUse);
     return true;
-  }
-
-  private getPathToTile(coordinates: Coordinates) {
-    return this.pathfinder.getPathTo({
-      end: coordinates
-    });
   }
 }
