@@ -1,5 +1,5 @@
 import { getProbabilityResult, getManhattanDistance } from "./utils";
-import { MapManagedUnit } from "./MapManagementService";
+import MapManagementService, { MapManagedUnit } from "./MapManagementService";
 
 interface ConflictProcessingServiceConstructor {
   defender: MapManagedUnit;
@@ -25,13 +25,19 @@ export type ConflictQueue = ReturnType<ConflictProcessingService["process"]>;
 export default class ConflictProcessingService {
   defender: MapManagedUnit;
   aggressor: MapManagedUnit;
+  mapManager: MapManagementService;
 
   constructor({ defender, aggressor }: ConflictProcessingServiceConstructor) {
     this.defender = defender;
     this.aggressor = aggressor;
+    this.mapManager = aggressor.unitManager.mapManager;
   }
 
   process() {
+    return this.createResults();
+  }
+
+  private createResults() {
     const results: ProcessTurnResult[] = [];
 
     let aggressorTurns = this.getNumberOfTurns("aggressor");
@@ -48,7 +54,40 @@ export default class ConflictProcessingService {
       }
     } while (aggressorTurns > 0 || defenderTurns > 0);
 
-    return results;
+    let abort = false;
+    return results.reduce(
+      (acc, result) => {
+        if (abort) {
+          return acc;
+        }
+
+        const {
+          config: { target },
+          damage,
+          didHit,
+          didMove
+        } = result;
+
+        const defender = target === "defender" ? this.aggressor : this.defender;
+
+        if (didMove && didHit) {
+          const defenderHealth = defender.unitManager.unit.stats.health;
+          const totalDamageTaken = defender.unitManager.damageTaken + damage;
+
+          defender.unitManager.damageTaken = Math.min(
+            totalDamageTaken,
+            defenderHealth
+          );
+        }
+
+        if (defender.unitManager.calculatedStats.health < 1) {
+          abort = true;
+        }
+
+        return acc.concat(result);
+      },
+      [] as ProcessTurnResult[]
+    );
   }
 
   private processTurn(target: Target) {
@@ -73,7 +112,8 @@ export default class ConflictProcessingService {
       damage: this.getDamage(target),
       accuracy: this.getAccuracy(target),
       critical: this.getCritical(target),
-      participant: aggressor
+      participant: aggressor,
+      target
     };
   }
 

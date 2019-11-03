@@ -1,15 +1,14 @@
 import compact from "lodash/compact";
-import UnitPathfindingService, {
-  Coordinates,
-  TerrainWithKey
-} from "./UnitPathfindingService";
-import { TerrainConfig, UnitAllegiance } from "../types";
+import UnitPathfindingService, { Coordinates } from "./UnitPathfindingService";
+import { TerrainConfig, UnitAllegiance, Item } from "../types";
 import GameManagementService from "./GameManagementService";
 import { getMapDimensions } from "./utils";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import { UnitCoordinates } from "./BattleManagementService/UnitManagementService/UnitManagementService";
 import EventEmitterService from "./EventEmitterService";
-import UnitBehaviorService from "./BattleManagementService/UnitManagementService/UnitBehaviorService";
+import ConflictProcessingService, {
+  ConflictQueue
+} from "./ConflictProcessingService";
 
 export type MapTileInformation = ReturnType<
   UnitPathfindingService["getTileInfo"]
@@ -30,11 +29,14 @@ export type MapManagedUnit = {
 
 type MapEvents = {
   moveUnit: (args: {
-    unit: UnitManagementService;
+    unit: MapManagedUnit;
     path: MapTileInformation[];
   }) => void;
+  pilferChest: (coordinates: Coordinates) => void;
   addUnits: (units: MapManagedUnit[]) => void;
   removeUnits: (units: MapManagedUnit[]) => void;
+  unitUseItem: (args: { unit: MapManagedUnit; item: Item }) => void;
+  conflict: (conflictQueue: ConflictQueue) => void;
 };
 
 export default class MapManagementService extends EventEmitterService<
@@ -63,6 +65,23 @@ export default class MapManagementService extends EventEmitterService<
     );
     this.emit("removeUnits", removedUnits);
     return this;
+  };
+
+  moveUnit = (unit: MapManagedUnit, path: MapTileInformation[]) =>
+    this.emit("moveUnit", { path: unit.pathfinder.commitToPath(path), unit });
+
+  pilferChest = (coordinates: Coordinates) =>
+    this.emit("pilferChest", coordinates);
+
+  unitUseItem = (unit: MapManagedUnit, item: Item) =>
+    this.emit("unitUseItem", { item, unit });
+
+  conflict = (config: {
+    aggressor: MapManagedUnit;
+    defender: MapManagedUnit;
+  }) => {
+    const conflictQueue = new ConflictProcessingService(config).process();
+    this.emit("conflict", conflictQueue);
   };
 
   get enemyUnits() {

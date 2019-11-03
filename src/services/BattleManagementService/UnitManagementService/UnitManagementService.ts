@@ -1,4 +1,11 @@
-import { WeaponType, Unit, UnitAllegiance, UnitBehavior } from "../../../types";
+import u from "updeep";
+import {
+  WeaponType,
+  Unit,
+  UnitAllegiance,
+  UnitBehavior,
+  StatListType
+} from "../../../types";
 import { increaseStats } from "../../utils";
 import GameManagementService from "../../GameManagementService";
 import MapManagementService from "../../MapManagementService";
@@ -23,6 +30,7 @@ export default class UnitManagementService {
   gameManager: GameManagementService;
   mapManager: MapManagementService;
   behavior: UnitBehavior = "PASSIVE";
+  damageTaken: number;
 
   constructor({
     unitCoordinates: { unit, allegiance, behavior },
@@ -60,7 +68,11 @@ export default class UnitManagementService {
   }
 
   get calculatedStats() {
-    return this.unit.stats;
+    const { stats } = this.unit;
+    return u(
+      { health: stats.health - this.damageTaken },
+      stats
+    ) as StatListType;
   }
 
   get items() {
@@ -108,10 +120,6 @@ export default class UnitManagementService {
 
   get attackRanges() {
     return this.equippableAttackWeapons.map(w => w.range);
-  }
-
-  get damageTaken() {
-    return this.unit.stats.health - this.calculatedStats.health;
   }
 
   get conflictStats() {

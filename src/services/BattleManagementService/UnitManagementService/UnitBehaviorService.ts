@@ -28,8 +28,6 @@ export default class UnitBehaviorService {
   battleManager: BattleManagementService;
   gameManager: GameManagementService;
 
-  eventQueue: any[] = [];
-
   constructor({
     mapManagedUnit,
     behavior,
@@ -45,14 +43,12 @@ export default class UnitBehaviorService {
   }
 
   process() {
-    this.eventQueue = [];
     if (!this.handleSelfPreservation()) {
       this.behaviorHandler();
     }
-    return this.eventQueue;
   }
 
-  get behaviorHandler() {
+  private get behaviorHandler() {
     switch (this.behavior) {
       case "ACTIVE":
         return this.handleActiveBehavior;
@@ -89,46 +85,10 @@ export default class UnitBehaviorService {
     );
   }
 
-  handleStationaryBehavior() {
-    if (this.unitManager.equippableAttackWeapons.length < 1) {
-      return true;
-    }
-
-    const { attackRanges } = this.unitManager;
-    const targetableUnits = this.pathfinder.attackableTiles
-      .filter(tile => {
-        if (!tile.unit) {
-          return false;
-        }
-
-        const distance = getManhattanDistance(
-          tile.coordinates,
-          this.pathfinder.currentCoordinates
-        );
-        return attackRanges.some(
-          ([min, max]) => distance <= max && distance >= min
-        );
-      })
-      .map(({ unit }) => unit);
-
-    const target = targetableUnits[0];
-    if (!target) {
-      return false;
-    }
-
-    const result = new ConflictProcessingService({
-      aggressor: this.mapManagedUnit,
-      defender: target
-    }).process();
-    this.eventQueue.push({
-      eventName: "conflict",
-      payload: result
-    });
-    return true;
-  }
+  handleStationaryBehavior() {}
 
   handleActiveBehavior() {
-    const target = sortBy(
+    const enemiesSortedByStrength = sortBy(
       this.enemyUnits,
       unit =>
         compareConflictStats({
@@ -136,118 +96,70 @@ export default class UnitBehaviorService {
           defender: unit
         }),
       "desc"
-    )[0];
-
+    );
+    const target = enemiesSortedByStrength[0];
     if (!target) {
-      return this.handleSupportBehavior();
+      console.log("no target");
+      return;
     }
 
     const { attackRanges } = this.unitManager;
-    const possibleTiles = this.pathfinder.processedTiles.filter(tile => {
-      const distance = getManhattanDistance(
-        tile.coordinates,
-        target.pathfinder.currentCoordinates
-      );
-      return attackRanges.some(
-        ([min, max]) => distance <= max && distance >= min
-      );
-    });
-    if (possibleTiles.length < 1) {
+    const possibleAttackSourceTiles = this.pathfinder.processedTiles.filter(
+      tile => {
+        const distanceFromTarget = getManhattanDistance(
+          target.pathfinder.currentCoordinates,
+          tile.coordinates
+        );
+        return attackRanges.some(
+          ([min, max]) => distanceFromTarget >= min && distanceFromTarget <= max
+        );
+      }
+    );
+
+    if (possibleAttackSourceTiles.length < 1) {
       console.log("Cant find path to tile to attack target from");
-      return this.handleStationaryBehavior();
+      return;
     }
 
     const targetTile = sortBy(
-      possibleTiles,
+      possibleAttackSourceTiles,
       tile => getTerrainSafety(tile.terrain),
       "desc"
     )[0];
 
     const pathToTile = this.getPathToTile(targetTile.coordinates);
     if (!pathToTile) {
-      return this.handleStationaryBehavior();
+      console.log("no path");
+      return;
     }
 
-    this.eventQueue.push({ type: "movement", payload: pathToTile });
-    return this.handleStationaryBehavior();
+    console.log("moving to coords");
+    this.mapManager.moveUnit(this.mapManagedUnit, pathToTile);
+
+    if (
+      this.pathfinder.compareCoordinates(
+        last(pathToTile).coordinates,
+        targetTile.coordinates
+      )
+    ) {
+      const target = this.pathfinder.attackableEnemiesFromCurrentCoordinates[0];
+      if (!target) {
+        console.log("no target");
+        return;
+      }
+
+      this.mapManager.conflict({
+        defender: target,
+        aggressor: this.mapManagedUnit
+      });
+    }
   }
 
   handlePassiveBehavior() {}
 
-  handleSupportBehavior() {
-    const targetableUnits = this.pathfinder.friendlyFireTiles
-      .filter(
-        tile =>
-          tile.unit &&
-          areUnitsAllied(tile.unit.unitManager, this.mapManagedUnit.unitManager)
-      )
-      .map(({ unit }) => unit);
+  handleSupportBehavior() {}
 
-    const target = sortBy(
-      targetableUnits,
-      unit => unit.unitManager.calculatedStats.health
-    )[0];
-
-    if (!target) {
-      return this.handleStationaryBehavior();
-    }
-
-    const { supportRanges } = this.unitManager;
-    const possibleTiles = this.pathfinder.walkableTiles.filter(tile => {
-      const distance = getManhattanDistance(
-        tile.coordinates,
-        target.pathfinder.currentCoordinates
-      );
-      return supportRanges.some(
-        ([min, max]) => distance <= max && distance >= min
-      );
-    });
-    const targetTile = sortBy(
-      possibleTiles,
-      tile => getTerrainSafety(tile.terrain),
-      "desc"
-    )[0];
-
-    const pathToTile = this.getPathToTile(targetTile.coordinates);
-    if (!pathToTile) {
-      return this.handleStationaryBehavior();
-    }
-
-    this.eventQueue.push({ type: "movement", payload: pathToTile });
-  }
-
-  handleThiefBehavior() {
-    const unopenedChests = this.mapManager.chests.filter(
-      ({ isOpened }) => !isOpened
-    );
-    const shortestPathToChest = unopenedChests.reduce(
-      (acc, { coordinates }) => {
-        const path = this.getPathToTile(coordinates);
-        if (!path || path.length === 0) {
-          return acc;
-        }
-        if (acc === null || path.length < acc.length) {
-          return path;
-        }
-      },
-      null as MapTileInformation[]
-    );
-    if (!shortestPathToChest) {
-      return this.handleActiveBehavior();
-    }
-
-    this.eventQueue.push({ type: "movement", payload: shortestPathToChest });
-
-    const { chest } = last(shortestPathToChest);
-    if (chest && !chest.isOpened) {
-      this.eventQueue.push({
-        type: "chestPilfered",
-        payload: chest
-      });
-    }
-
-    return true;
-  }
+  handleThiefBehavior() {}
 
   handleSelfPreservation() {
     const { healingItems, damageTaken } = this.unitManager;
@@ -257,7 +169,7 @@ export default class UnitBehaviorService {
       return false;
     }
 
-    this.eventQueue.push({ type: "itemUsed", payload: itemToUse });
+    this.mapManager.unitUseItem(this.mapManagedUnit, itemToUse);
     return true;
   }
 

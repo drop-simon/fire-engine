@@ -94,7 +94,7 @@ mapManager.addUnits([
 ]);
 
 const renderMap = () => {
-  console.clear();
+  // console.clear();
   console.log(
     battleManager.map.terrain
       .map((row, y) =>
@@ -130,6 +130,41 @@ const enemyBehavior = battleManager.getUnitBehaviorFromCoordinates(
 );
 
 renderMap();
-const enemyAction = enemyBehavior.process();
-console.log(enemyAction);
+
+mapManager.addEventListener("moveUnit", ({ unit, path }) => {
+  path.forEach((step, i) => {
+    setTimeout(() => {
+      unit.pathfinder.currentCoordinates = step.coordinates;
+      // renderMap();
+    }, (i + 1) * 300);
+  });
+});
+
+mapManager.addEventListener("conflict", results =>
+  results.forEach(
+    ({ config: { participant }, didMove, didHit, didCritical, damage }) => {
+      const unitName = participant.unitManager.unit.name;
+      if (didMove) {
+        console.log(`${unitName} attacks.`);
+
+        if (didHit) {
+          const message = `${unitName} deals ${damage}${
+            didCritical ? " with a critical hit!!" : ""
+          }!`;
+          console.log(message);
+        } else {
+          console.log("The attack missed!");
+        }
+      } else {
+        console.log(`${unitName} doesn't move.`);
+      }
+    }
+  )
+);
+
+enemyBehavior.process();
+enemyBehavior.process();
+enemyBehavior.process();
 // }, 1000);
+
+renderMap();

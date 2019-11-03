@@ -1,21 +1,15 @@
 import Graph from "node-dijkstra";
 import compact from "lodash/compact";
-import uniqBy from "lodash/uniqBy";
-import {
-  TerrainConfig,
-  UnitAllegiance,
-  WeaponType,
-  UnitBehavior
-} from "../types";
+import { TerrainConfig, UnitAllegiance } from "../types";
 import MapManagementService, {
-  MapTileInformation
+  MapTileInformation,
+  MapManagedUnit
 } from "./MapManagementService";
-import { getManhattanDistance, getTargetableTiles } from "./utils";
+import { getManhattanDistance } from "./utils";
 import GameManagementService from "./GameManagementService";
 import UnitManagementService from "./BattleManagementService/UnitManagementService";
 import merge from "lodash/merge";
 import { areUnitsAllied } from "./BattleManagementService/UnitManagementService/utils";
-import UnitBehaviorService from "./BattleManagementService/UnitManagementService/UnitBehaviorService";
 
 export type Coordinates = {
   x: number;
@@ -51,12 +45,13 @@ type UnitPathfindingServiceConstructor = {
 export default class UnitPathfindingService {
   gameManager: GameManagementService;
   mapManager: MapManagementService;
-  unitManager: UnitManagementService;
-  allegiance: UnitAllegiance;
   currentCoordinates: Coordinates;
   processedTiles: MapTileInformation[] = [];
   tileMap: { [key: string]: MapTileInformation } = {};
   graph = new Graph();
+  unitManager: UnitManagementService;
+  allegiance: UnitAllegiance;
+  mapManagedUnit: MapManagedUnit;
 
   constructor({
     mapManager,
@@ -69,6 +64,11 @@ export default class UnitPathfindingService {
     this.currentCoordinates = coordinates;
     this.unitManager = unitManager;
     this.allegiance = unitManager.allegiance;
+    this.mapManagedUnit = {
+      pathfinder: this,
+      unitManager,
+      allegiance: unitManager.allegiance
+    };
 
     this.mapManager.map.terrain.forEach((row, y) => {
       row.forEach((_, x) => {
@@ -108,7 +108,6 @@ export default class UnitPathfindingService {
         }
 
         const path = this.getPathTo({
-          start: currentCoordinates,
           end: tile.coordinates,
           graph: this.movementRangeGraph
         });
@@ -135,6 +134,22 @@ export default class UnitPathfindingService {
 
   get attackableTiles() {
     return this.getTargetableTiles({ friendly: false });
+  }
+
+  get attackableEnemiesFromCurrentCoordinates() {
+    const { attackRanges } = this.unitManager;
+    const enemies = ["PLAYER", "NEUTRAL"].includes(this.allegiance)
+      ? this.mapManager.enemyUnits
+      : [...this.mapManager.playerUnits, ...this.mapManager.neutralUnits];
+    return enemies.filter(enemy => {
+      const distanceFromUnit = getManhattanDistance(
+        this.mapManagedUnit.pathfinder.currentCoordinates,
+        enemy.pathfinder.currentCoordinates
+      );
+      return attackRanges.some(
+        ([min, max]) => distanceFromUnit <= max && distanceFromUnit >= min
+      );
+    });
   }
 
   getPathTo: GetPathTo = ({
@@ -175,8 +190,9 @@ export default class UnitPathfindingService {
 
   commitToPath = (path: MapTileInformation[]) => {
     // TODO: FOG OF WAR INTERRUPTING PATH
+    const calculatedPath = path;
     this.currentCoordinates = path[path.length - 1].coordinates;
-    this.emitMovement(path);
+    return calculatedPath;
   };
 
   getAdjacentTiles = (coordinates: Coordinates) =>
@@ -218,10 +234,6 @@ export default class UnitPathfindingService {
 
   compareCoordinates = (coordsA: Coordinates, coordsB: Coordinates) =>
     this.createTileKey(coordsA) === this.createTileKey(coordsB);
-
-  private emitMovement(path: MapTileInformation[]) {
-    this.mapManager.emit("moveUnit", { path, unit: this.unitManager });
-  }
 
   private getTargetableTiles({ friendly }: { friendly: boolean }) {
     const conflictRanges = this.unitManager[
