@@ -85,7 +85,7 @@ export const createGrowthRates = ({
   birthMonth: BirthMonthType;
   bloodType: BloodType;
 }) => {
-  const growthRates = {
+  const growthRates: StatGrowthRateListType = {
     health: 0.8,
     power: BASE_GROWTH_RATE,
     skill: BASE_GROWTH_RATE,
@@ -118,43 +118,69 @@ export const createGrowthRates = ({
     );
   });
 
-  return growthRates as StatGrowthRateListType;
+  return growthRates;
 };
 
-export const getStartingHealth = ({
+const BASE_STAT_RANGES = [
+  [0, 1], // super detriment
+  [1, 2], // detriment
+  [2, 3], // neutral
+  [3, 4], // benefit
+  [4, 5] // super benefit
+];
+const BASE_HEALTH_RANGES = [
+  [8, 9], // super detriment
+  [10, 11], // detriment
+  [12, 13, 14], // neutral
+  [15, 16], // benefit
+  [17, 18] // super benefit
+];
+
+export const createStartingStats = ({
   birthMonth,
   bloodType
 }: {
   birthMonth: BirthMonthType;
   bloodType: BloodType;
 }) => {
-  let i = 2;
+  const statList: StatGrowthRateListType = {
+    health: 0,
+    power: 0,
+    skill: 0,
+    speed: 0,
+    luck: 0,
+    defense: 0,
+    resistance: 0
+  };
 
-  const startingHealthRanges = [
-    [8, 9], // super detriment
-    [10, 11], // detriment
-    [12, 13, 14], // neutral
-    [15, 16], // benefit
-    [17, 18] // super benefit
+  const benefits = [
+    BLOOD_TYPE_MODIFIERS[bloodType].BENEFIT,
+    BIRTH_MONTH_MODIFIERS[birthMonth].BENEFIT
+  ];
+  const detriments = [
+    BLOOD_TYPE_MODIFIERS[bloodType].DETRIMENT,
+    BIRTH_MONTH_MODIFIERS[birthMonth].DETRIMENT
   ];
 
-  const bloodTypeBenefits = BLOOD_TYPE_MODIFIERS[bloodType].BENEFIT;
-  const bloodTypeDetriments = BLOOD_TYPE_MODIFIERS[bloodType].DETRIMENT;
-  if (bloodTypeBenefits.includes("health")) {
-    i = Math.max(0, i - 1);
-  }
-  if (bloodTypeDetriments.includes("health")) {
-    i = Math.max(0, i - 1);
+  for (const key in statList) {
+    let i = 2;
+    benefits.forEach(list => {
+      if (list.includes(key)) {
+        i = Math.max(0, i - 1);
+      }
+    });
+    detriments.forEach(list => {
+      if (list.includes(key)) {
+        i = Math.min(4, i + 1);
+      }
+    });
+
+    if (key === "health") {
+      statList[key] = sample(BASE_HEALTH_RANGES[i]);
+    } else {
+      statList[key as keyof typeof statList] = sample(BASE_STAT_RANGES[i]);
+    }
   }
 
-  const birthMonthBenefits = BIRTH_MONTH_MODIFIERS[birthMonth].BENEFIT;
-  const birthMonthDetriments = BIRTH_MONTH_MODIFIERS[birthMonth].DETRIMENT;
-  if (birthMonthBenefits.includes("health")) {
-    i = Math.min(4, i + 1);
-  }
-  if (birthMonthDetriments.includes("health")) {
-    i = Math.min(4, i + 1);
-  }
-
-  return sample(startingHealthRanges[i]);
+  return statList;
 };

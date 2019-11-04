@@ -46,6 +46,13 @@ export default class UnitManagementService {
     }
   }
 
+  takeDamage = (amount: number) => {
+    this.damageTaken = Math.min(
+      this.unit.stats.health,
+      this.damageTaken + amount
+    );
+  };
+
   levelUp() {
     if (this.unit.level === 20) {
       return this;

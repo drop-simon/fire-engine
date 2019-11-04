@@ -8,17 +8,9 @@ interface ConflictProcessingServiceConstructor {
 
 type Target = "aggressor" | "defender";
 
-type ConflictParticipantConfig = ReturnType<
-  ConflictProcessingService["createParticipantConfig"]
+export type ConflictQueueItem = ReturnType<
+  ConflictProcessingService["processTurn"]
 >;
-
-type ProcessTurnResult = {
-  config: ConflictParticipantConfig;
-  didMove: boolean;
-  didHit: boolean;
-  didCritical: boolean;
-  damage: number;
-};
 
 export type ConflictQueue = ReturnType<ConflictProcessingService["process"]>;
 
@@ -38,7 +30,7 @@ export default class ConflictProcessingService {
   }
 
   private createResults() {
-    const results: ProcessTurnResult[] = [];
+    const results: ConflictQueueItem[] = [];
 
     let aggressorTurns = this.getNumberOfTurns("aggressor");
     let defenderTurns = this.getNumberOfTurns("defender");
@@ -55,6 +47,10 @@ export default class ConflictProcessingService {
     } while (aggressorTurns > 0 || defenderTurns > 0);
 
     let abort = false;
+    const remainingHealth = {
+      aggressor: this.aggressor.unitManager.calculatedStats.health,
+      defender: this.aggressor.unitManager.calculatedStats.health
+    };
     return results.reduce(
       (acc, result) => {
         if (abort) {
@@ -62,29 +58,28 @@ export default class ConflictProcessingService {
         }
 
         const {
-          config: { defender },
+          config: { target },
           damage,
           didHit,
           didMove
         } = result;
 
-        if (didMove && didHit) {
-          const defenderHealth = defender.unitManager.unit.stats.health;
-          const totalDamageTaken = defender.unitManager.damageTaken + damage;
+        const defenderKey = target === "defender" ? "aggressor" : "defender";
 
-          defender.unitManager.damageTaken = Math.min(
-            totalDamageTaken,
-            defenderHealth
+        if (didMove && didHit) {
+          remainingHealth[defenderKey] = Math.max(
+            remainingHealth[defenderKey] - damage,
+            0
           );
         }
 
-        if (defender.unitManager.calculatedStats.health < 1) {
+        if (remainingHealth[defenderKey] < 1) {
           abort = true;
         }
 
         return acc.concat(result);
       },
-      [] as ProcessTurnResult[]
+      [] as ConflictQueueItem[]
     );
   }
 
@@ -93,7 +88,7 @@ export default class ConflictProcessingService {
     const { accuracy, critical, damage } = config;
 
     const didCritical = getProbabilityResult(critical);
-    const result: ProcessTurnResult = {
+    const result = {
       config,
       didMove: this.getCanMove(target),
       didHit: getProbabilityResult(accuracy),

@@ -1,6 +1,7 @@
 import { StatListType, StatGrowthRateListType, TerrainConfig } from "../types";
 import { MapTerrain, MapTileInformation } from "./MapManagementService";
 import { Coordinates } from "./UnitPathfindingService";
+import { AsyncIteratorHandler } from "../types/util";
 
 // probability is a float between 0 and 1
 export const getProbabilityResult = (probability: number) =>
@@ -55,3 +56,34 @@ export const getTargetableTiles = ({
     return distance <= max && distance >= min;
   });
 };
+
+export const iterateQueueAsync: AsyncIteratorHandler = ({
+  queue,
+  iterator = () => {},
+  onEnd = () => {}
+}) =>
+  new Promise(resolve => {
+    const handleEnd = () => {
+      onEnd();
+      resolve();
+    };
+
+    if (!iterator) {
+      handleEnd();
+      return;
+    }
+
+    let shouldAbort = false;
+    let index = -1;
+    const abort = () => (shouldAbort = true);
+    const next = () => {
+      index++;
+      if (shouldAbort || index === queue.length) {
+        handleEnd();
+        return;
+      }
+      const item = queue[index];
+      iterator({ item, index, next, abort });
+    };
+    next();
+  });

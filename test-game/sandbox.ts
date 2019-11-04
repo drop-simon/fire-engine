@@ -18,7 +18,7 @@ const {
 const Calypso = new UnitCreationService({
   level: 15,
   name: "Calypso",
-  birthMonth: "March",
+  birthMonth: "February",
   bloodType: "B",
   sex: "F",
   items: [Items.Weapons.SilverAxe],
@@ -30,8 +30,8 @@ const Calypso = new UnitCreationService({
 const Artemis = new UnitCreationService({
   level: 17,
   name: "Artemis",
-  birthMonth: "August",
-  bloodType: "O",
+  birthMonth: "November",
+  bloodType: "AB",
   sex: "M",
   items: [Items.Weapons.SilverAxe],
   weaponLevels: [{ specialty: "Axes", level: "A" }],
@@ -126,8 +126,6 @@ const renderMap = () => {
   console.log(logs.join("\n"));
 };
 
-// setTimeout(() => {
-// const player = battleManager.playerUnits[0];
 const enemy = battleManager.enemyUnits[0];
 const enemyBehavior = battleManager.getUnitBehaviorFromCoordinates(
   enemy.pathfinder.currentCoordinates
@@ -157,13 +155,6 @@ mapManager.addEventListener("conflict", results => {
             didCritical ? " with a critical hit!!" : ""
           }!`;
           logs.push(message);
-
-          const defenderHealth = defender.unitManager.calculatedStats.health;
-          const defenderName = defender.unitManager.unit.name;
-          logs.push(`${defenderName} has ${defenderHealth} health remaining.`);
-          if (defenderHealth < 1) {
-            console.log(`${defenderName} has died.`);
-          }
         } else {
           logs.push("The attack missed!");
         }
@@ -174,6 +165,9 @@ mapManager.addEventListener("conflict", results => {
   );
   renderMap();
 });
+
+console.log(Artemis.stats);
+console.log(Calypso.stats);
 
 renderMap();
 
@@ -188,3 +182,5 @@ setTimeout(() => {
 setTimeout(() => {
   enemyBehavior.process();
 }, 6000);
+
+console.log(Calypso.stats.health);
